@@ -11,32 +11,26 @@ import {
   scaleOrdinal,
   schemeBlues,
   schemeSet3,
-  scaleLinear,
-  max,
 } from 'd3';
-import totalToolUsage from '../../constants';
 
-const width = 1000;
-const height = 1000;
+const width = 500;
+const height = 500;
 const margin = { top: 0, bottom: 0, left: 0, right: 0 };
 
-function DonutChart({ data, year, innerRadiusScale }) {
-  const ref = useRef();
+export const drawDonut = () => (g) => {};
 
-  // Handle drawing donut
+function DonutChart({ reference, data, year }) {
+  //   const ref = useRef();
+
   useEffect(() => {
-    const svg = select(ref.current);
+    const svg = reference; // select(ref.current);
 
-    const arcGenerator = arc()
-      .innerRadius(innerRadiusScale(totalToolUsage[year]))
-      .outerRadius(innerRadiusScale(totalToolUsage[year]) + 10);
+    const arcGenerator = arc().innerRadius(30).outerRadius(50);
     const pieGenerator = pie()
       .value(function (d) {
         return d[`${year}_users`];
       })
       .sort(null);
-
-    console.log(innerRadiusScale(3000));
 
     // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
     const radius = Math.min(width, height) / 2 - margin;
@@ -45,6 +39,9 @@ function DonutChart({ data, year, innerRadiusScale }) {
     const color = scaleOrdinal()
       .domain(data.map((d) => d.tool))
       .range(schemeSet3);
+
+    console.log(pieGenerator(data));
+    console.log(data);
 
     // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
     svg
@@ -59,7 +56,7 @@ function DonutChart({ data, year, innerRadiusScale }) {
       .style('opacity', 0.7);
   }, []);
 
-  return <svg ref={ref} width={width} height={height} />;
+  return <svg ref={reference} width={width} height={height} />;
 }
 
 export default DonutChart;
