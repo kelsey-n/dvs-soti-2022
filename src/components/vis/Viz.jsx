@@ -20,7 +20,7 @@ const datasetNames = {
   2017: data2017,
 };
 
-function Viz() {
+function Viz({ sort }) {
   const ref = useRef();
 
   const datasets = [];
@@ -72,6 +72,7 @@ function Viz() {
           year={year}
           innerRadiusScale={innerRadiusScale}
           outerRadiusScale={outerRadiusScale}
+          sort={sort}
         />
       ))}
     </svg>

@@ -20,49 +20,55 @@ const width = 1000;
 const height = 1000;
 const margin = { top: 0, bottom: 0, left: 0, right: 0 };
 
-function DonutChart({ data, year, innerRadiusScale, outerRadiusScale }) {
+console.log(totalToolUsage);
+
+function DonutChart({ data, year, innerRadiusScale, outerRadiusScale, sort }) {
   const ref = useRef();
+
+  const arcGenerator = arc()
+    .innerRadius(innerRadiusScale(totalToolUsage[year]))
+    .outerRadius(function (d) {
+      return (
+        innerRadiusScale(totalToolUsage[year]) +
+        outerRadiusScale(d.data[`${year}_meantools`])
+      );
+    })
+    .cornerRadius(3);
 
   // Handle drawing donut
   useEffect(() => {
     const svg = select(ref.current);
 
-    const arcGenerator = arc()
-      .innerRadius(innerRadiusScale(totalToolUsage[year]))
-      .outerRadius(function (d) {
-        return (
-          innerRadiusScale(totalToolUsage[year]) +
-          outerRadiusScale(d.data[`${year}_meantools`])
-        );
-      })
-      .cornerRadius(3);
+    // Default sorting of the pie layout is by value descending (number of users of each tool)
+    const pieGenerator = pie().value(function (d) {
+      return d[`${year}_users`];
+    });
 
-    const pieGenerator = pie()
-      .value(function (d) {
-        return d[`${year}_users`];
-      })
-      .sort(null);
+    // Apply a custom sort function when we change the sort
+    if (sort === 'toolName') {
+      pieGenerator.sort(function (a, b) {
+        return a.tool.localeCompare(b.tool);
+      });
+    }
 
-    // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
-    const radius = Math.min(width, height) / 2 - margin;
-
-    // set the color scale
+    // TEMPORARY color scale
     const color = scaleOrdinal()
       .domain(data.map((d) => d.tool))
       .range(schemeSet3);
 
-    // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
+    // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function. Inspired by https://d3-graph-gallery.com/graph/donut_basic.html
     svg
-      .selectAll('whatever')
+      .selectAll('.ring-arc')
       .data(pieGenerator(data))
       .join('path')
+      .attr('class', 'ring-arc')
       .attr('transform', `translate(${width / 2}, ${height / 2})`)
       .attr('d', arcGenerator)
       .attr('fill', (d) => color(d.data.tool))
       .attr('stroke', 'black')
-      .style('stroke-width', '1px')
+      .style('stroke-width', '0.5px')
       .style('opacity', 0.7);
-  }, []);
+  }, [sort]);
 
   return <svg ref={ref} width={width} height={height} />;
 }

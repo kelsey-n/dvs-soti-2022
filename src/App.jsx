@@ -1,17 +1,19 @@
 import { useState } from 'react';
 import Viz from './components/vis/Viz';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
+import Controls from './components/controls/Controls';
 import data from './assets/mergedOutputAllYears_v6.csv';
+import './App.css';
+
+const sortOptions = { toolName: 'tool name', toolUsage: 'tool usage' };
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [sort, setSort] = useState('toolUsage');
 
   return (
-    <>
-      <Viz />
-    </>
+    <div className="app-wrapper">
+      <Controls sort={sort} setSort={setSort} sortOptions={sortOptions} />
+      <Viz sort={sort} />
+    </div>
   );
 }
 
