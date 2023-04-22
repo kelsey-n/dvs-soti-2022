@@ -1,6 +1,13 @@
 import { useState } from 'react';
 
-function Controls({ sort, setSort, sortOptions }) {
+function Controls({
+  sort,
+  setSort,
+  sortOptions,
+  ringWidth,
+  setRingWidth,
+  ringWidthOptions,
+}) {
   const sortOptionsToLabel = {};
   return (
     <div>
@@ -15,6 +22,23 @@ function Controls({ sort, setSort, sortOptions }) {
           }}
         >
           {Object.entries(sortOptions).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </select>
+      </form>
+      {/* Options to change ring width */}
+      <form>
+        <label htmlFor="ring-width-select">Determine ring width by </label>
+        <select
+          id="ring-width-select"
+          value={ringWidth}
+          onChange={(event) => {
+            setRingWidth(event.target.value);
+          }}
+        >
+          {Object.entries(ringWidthOptions).map(([value, label]) => (
             <option key={value} value={value}>
               {label}
             </option>

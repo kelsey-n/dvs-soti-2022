@@ -5,13 +5,22 @@ import data from './assets/mergedOutputAllYears_v6.csv';
 import './App.css';
 
 const sortOptions = { toolName: 'tool name', toolUsage: 'tool usage' };
+const ringWidthOptions = { toolName: 'tool name', toolUsage: 'tool usage' };
 
 function App() {
   const [sort, setSort] = useState('toolUsage');
+  const [ringWidth, setRingWidth] = useState('toolUsage');
 
   return (
     <div className="app-wrapper">
-      <Controls sort={sort} setSort={setSort} sortOptions={sortOptions} />
+      <Controls
+        sort={sort}
+        setSort={setSort}
+        sortOptions={sortOptions}
+        ringWidth={ringWidth}
+        setRingWidth={setRingWidth}
+        ringWidthOptions={ringWidthOptions}
+      />
       <Viz sort={sort} />
     </div>
   );
