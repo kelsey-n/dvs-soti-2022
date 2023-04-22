@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { max, select, scaleLinear, min } from 'd3';
+import { max, select, scaleLinear, min, extent } from 'd3';
 import DonutChart from './DonutChart';
 import data from '../../assets/mergedOutputAllYears_v6.csv';
 import totalToolUsage from '../../constants';
@@ -35,8 +35,20 @@ function Viz() {
 
   // Scales
   const innerRadiusScale = scaleLinear()
-    .domain([0, max(Object.values(totalToolUsage))])
-    .range([0, min([width, height]) / 2 - outerRingMargin]);
+    // .domain([0, max(Object.values(totalToolUsage))])
+    // .range([0, min([width, height]) / 2 - outerRingMargin])
+    .domain(extent(Object.values(totalToolUsage)))
+    .range([20, min([width, height]) / 2 - outerRingMargin]);
+
+  const outerRadiusScale = scaleLinear()
+    .domain(
+      extent(
+        dataFiltered.map((d) => years.map((y) => d[`${y}_meantools`])).flat()
+      )
+    )
+    .range([3, 30]);
+
+  //   console.log(dataFiltered);
 
   //   // Add parent components for all groups of elements
   //   useEffect(() => {
@@ -59,6 +71,7 @@ function Viz() {
           data={dataFiltered}
           year={year}
           innerRadiusScale={innerRadiusScale}
+          outerRadiusScale={outerRadiusScale}
         />
       ))}
     </svg>

@@ -20,7 +20,7 @@ const width = 1000;
 const height = 1000;
 const margin = { top: 0, bottom: 0, left: 0, right: 0 };
 
-function DonutChart({ data, year, innerRadiusScale }) {
+function DonutChart({ data, year, innerRadiusScale, outerRadiusScale }) {
   const ref = useRef();
 
   // Handle drawing donut
@@ -29,14 +29,19 @@ function DonutChart({ data, year, innerRadiusScale }) {
 
     const arcGenerator = arc()
       .innerRadius(innerRadiusScale(totalToolUsage[year]))
-      .outerRadius(innerRadiusScale(totalToolUsage[year]) + 10);
+      .outerRadius(function (d) {
+        return (
+          innerRadiusScale(totalToolUsage[year]) +
+          outerRadiusScale(d.data[`${year}_meantools`])
+        );
+      })
+      .cornerRadius(3);
+
     const pieGenerator = pie()
       .value(function (d) {
         return d[`${year}_users`];
       })
       .sort(null);
-
-    console.log(innerRadiusScale(3000));
 
     // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
     const radius = Math.min(width, height) / 2 - margin;
