@@ -10,3 +10,8 @@ for (const year of years) {
 }
 
 export default totalToolUsage;
+// -------------------------------------------------------------------
+
+export const dataFilters = {
+  minTotalUsers: 30,
+};

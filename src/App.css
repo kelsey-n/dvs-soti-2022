@@ -47,3 +47,15 @@
   flex-direction: row;
   gap: 20px;
 }
+
+.viz-svg-container {
+  position: relative;
+}
+
+.tooltip {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  /* background-color: lightsteelblue; */
+  text-align: left;
+}

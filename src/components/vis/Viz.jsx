@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { max, select, scaleLinear, min, extent } from 'd3';
 import DonutChart from './DonutChart';
 import data from '../../assets/mergedOutputAllYears_v6.csv';
-import totalToolUsage from '../../constants';
+import totalToolUsage, { dataFilters } from '../../constants';
 
 const width = 1000;
 const height = 1000;
@@ -23,10 +23,16 @@ const datasetNames = {
 function Viz({ sort }) {
   const ref = useRef();
 
+  const [hoveredTool, setHoveredTool] = useState(null);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [hoveredData, setHoveredData] = useState([0, 0]);
+
   const datasets = [];
 
   // Filter & aggregate for each year here (including eventually having dynamic number of tools in 'Other')
-  const dataFiltered = data.filter((d) => d.total_users > 30); // in general, we will only consider those tools with at least 30 users over all 6 years
+  const dataFiltered = data.filter(
+    (d) => d.total_users > dataFilters.minTotalUsers // in general, we will only consider those tools with at least a certain number of users over all 6 years
+  );
 
   //   for (const [year, dataset] of Object.entries(datasetNames)) {
   //     dataset = dataFiltered;
@@ -64,18 +70,26 @@ function Viz({ sort }) {
   }, []);
 
   return (
-    <svg ref={ref} width={width} height={height}>
-      {years.map((year) => (
-        <DonutChart
-          key={year}
-          data={dataFiltered}
-          year={year}
-          innerRadiusScale={innerRadiusScale}
-          outerRadiusScale={outerRadiusScale}
-          sort={sort}
-        />
-      ))}
-    </svg>
+    <div className="viz-svg-container">
+      <svg ref={ref} width={width} height={height}>
+        {years.map((year) => (
+          <DonutChart
+            key={year}
+            data={dataFiltered}
+            year={year}
+            innerRadiusScale={innerRadiusScale}
+            outerRadiusScale={outerRadiusScale}
+            sort={sort}
+            hoveredTool={hoveredTool}
+            setHoveredTool={setHoveredTool}
+            showTooltip={showTooltip}
+            setShowTooltip={setShowTooltip}
+            hoveredData={hoveredData}
+            setHoveredData={setHoveredData}
+          />
+        ))}
+      </svg>
+    </div>
   );
 }
 
