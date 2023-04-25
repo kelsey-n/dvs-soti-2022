@@ -14,6 +14,7 @@ import {
   scaleLinear,
   max,
   selectAll,
+  local,
 } from 'd3';
 import totalToolUsage from '../../constants';
 
@@ -55,6 +56,16 @@ function DonutChart({
     })
     .cornerRadius(3);
 
+  // !!!!!!!!!!!!!!!!! TO TRY: useMemo to memoize pieGenerator !!!!!!!!!!!!!!!!!!!
+  //example:
+  //     const pie = useMemo(() => {
+  //     const pieGenerator = d3
+  //       .pie<any, DataItem>()
+  //       .value((d) => d.value || 0)
+  //       .sort(null); // Do not apply any sorting, respect the order of the provided dataset
+  //     return pieGenerator(sortedData);
+  //   }, [data]);
+
   // Default sorting of the pie layout is by value descending (number of users of each tool)
   const pieGenerator = pie().value(function (d) {
     return d[`${year}_users`];
@@ -81,6 +92,8 @@ function DonutChart({
   // Handle initial drawing:
   useEffect(() => {
     const svg = select(ref.current);
+
+    let previousAngles = local();
 
     let angleInterpolation = interpolate(
       pieGenerator.startAngle()(),
@@ -115,12 +128,63 @@ function DonutChart({
       .attr('fill', (d) => color(d.data.tool))
       .attr('stroke', 'black')
       .style('stroke-width', '0.5px')
-      .style('opacity', 0.7);
+      .style('opacity', 0.7)
+      .each(function (d) {
+        // Store previous data locally on each node
+        // previousStartAngle.set(this, d.startAngle);
+        // previousEndAngle.set(this, d.endAngle);
+        previousAngles.set(this, d);
+      });
+    //   .transition()
+    //   .duration(750)
+    //   .attrTween('d', arcTween);
   }, []);
 
   // Handle re-sorting
   useEffect(() => {
     const svg = select(ref.current);
+
+    let previousStartAngle = local(),
+      previousEndAngle = local();
+    let previousAngles = local();
+
+    // let startAngleInterpolation = interpolate(
+    //   previousStartAngle.get(this),
+    //   pieGenerator.startAngle()()
+    // );
+    // let endAngleInterpolation = interpolate(
+    //   previousEndAngle.get(this),
+    //   pieGenerator.endAngle()()
+    // );
+    // Set up the arc tween function - this animates arcs to their new positions after sorting
+    const arcTween = (a) => {
+      const i = interpolate(previousAngles.get(this), a);
+      previousAngles.set(this, i(0));
+      return (t) => {
+        const d = i(t);
+        const pos = arcGenerator.centroid(d);
+        const midAngle = (d.startAngle + d.endAngle) / 2;
+        pos[0] = radius * 0.8 * (midAngle < Math.PI ? 1 : -1);
+        return arcGenerator(d);
+      };
+      //   var i = interpolate(previousAngles.get(this), d);
+      //   //   this._current = i(0);
+      //   previousAngles.set(this, i(0));
+      //   return function (t) {
+      //     return arcGenerator(i(t));
+      //   };
+      //   let originalEnd = d.endAngle;
+      //   return (t) => {
+      //     let currentAngle = angleInterpolation(t);
+      //     if (currentAngle < d.startAngle) {
+      //       return '';
+      //     }
+
+      //     d.endAngle = Math.min(currentAngle, originalEnd);
+
+      //     return arcGenerator(d);
+      //   };
+    };
 
     svg
       .selectAll('.ring-arc')
@@ -129,7 +193,17 @@ function DonutChart({
       //   .enter()
       //   .append('path')
       .attr('class', 'ring-arc')
+      .each(function (d) {
+        // Store previous data locally on each node
+        // previousStartAngle.set(this, d.startAngle);
+        // previousEndAngle.set(this, d.endAngle);
+        previousAngles.set(this, d);
+        console.log(previousAngles.get(this));
+      })
       .attr('d', arcGenerator);
+    //   .transition()
+    //   .duration(1000)
+    //   .attrTween('d', arcTween);
   }, [sort]);
 
   // Handle hovering on an arc - opacity change & tooltips

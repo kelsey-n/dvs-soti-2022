@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { max, select, scaleLinear, min, extent } from 'd3';
 import DonutChart from './DonutChart';
+import DonutChartSpring from './DonutChartSpring';
 import data from '../../assets/mergedOutputAllYears_v6.csv';
 import totalToolUsage, { dataFilters } from '../../constants';
 
@@ -73,7 +74,7 @@ function Viz({ sort }) {
     <div className="viz-svg-container">
       <svg ref={ref} width={width} height={height}>
         {years.map((year) => (
-          <DonutChart
+          <DonutChartSpring
             key={year}
             data={dataFiltered}
             year={year}
