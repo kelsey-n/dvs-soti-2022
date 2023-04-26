@@ -35,8 +35,8 @@ function DonutChartSpring({
   setHoveredTool,
   showTooltip,
   setShowTooltip,
-  hoveredData,
-  setHoveredData,
+  //   hoveredData,
+  //   setHoveredData,
 }) {
   const ref = useRef();
 
@@ -61,6 +61,8 @@ function DonutChartSpring({
     .domain(data.map((d) => d.tool))
     .range(schemeSet3);
 
+  //   if (hoveredTool)
+  //     setHoveredData(pieData.filter((d) => d.data.tool === hoveredTool)[0]);
   //   // Tooltip
   //   const tooltipWidth = 150;
   //   let tooltipPos;
@@ -86,7 +88,7 @@ function DonutChartSpring({
         hoveredTool={hoveredTool}
         setHoveredTool={setHoveredTool}
         setShowTooltip={setShowTooltip}
-        setHoveredData={setHoveredData}
+        // setHoveredData={setHoveredData}
       />
     );
   });
@@ -108,7 +110,7 @@ const Slice = ({
   hoveredTool,
   setHoveredTool,
   setShowTooltip,
-  setHoveredData,
+  //   setHoveredData,
 }) => {
   const arcGenerator = arc()
     .innerRadius(innerRadiusScale(totalToolUsage[year]))
@@ -120,6 +122,7 @@ const Slice = ({
     })
     .cornerRadius(3);
 
+  // Inspired by donut data transition here: https://www.react-graph-gallery.com/donut
   const springProps = useSpring({
     config: {
       //   duration: 2000,
@@ -142,12 +145,12 @@ const Slice = ({
   const handleMouseOver = () => {
     setHoveredTool(sliceData.data.tool);
     setShowTooltip(true);
-    setHoveredData(sliceData);
+    // setHoveredData(sliceData);
   };
   const handleMouseOut = () => {
     setHoveredTool(null);
     setShowTooltip(false);
-    selectAll('.tooltip').remove();
+    // selectAll('.tooltip').remove();
   };
 
   return (

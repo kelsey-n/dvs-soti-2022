@@ -26,7 +26,7 @@ function Viz({ sort }) {
 
   const [hoveredTool, setHoveredTool] = useState(null);
   const [showTooltip, setShowTooltip] = useState(false);
-  const [hoveredData, setHoveredData] = useState([0, 0]);
+  //   const [hoveredData, setHoveredData] = useState([0, 0]);
 
   const datasets = [];
 
@@ -66,9 +66,12 @@ function Viz({ sort }) {
   //     one(svg, 'g', 'bar-listing-parent');
   //   });
 
-  useEffect(() => {
-    const svg = select(ref.current);
-  }, []);
+  //   useEffect(() => {
+  //     const svg = select(ref.current);
+  //   }, []);
+
+  console.log(dataFiltered.filter((d) => d.tool === hoveredTool)[0]);
+  const hoveredData = dataFiltered.filter((d) => d.tool === hoveredTool)[0];
 
   return (
     <div className="viz-svg-container">
@@ -85,11 +88,18 @@ function Viz({ sort }) {
             setHoveredTool={setHoveredTool}
             showTooltip={showTooltip}
             setShowTooltip={setShowTooltip}
-            hoveredData={hoveredData}
-            setHoveredData={setHoveredData}
+            // hoveredData={hoveredData}
+            // setHoveredData={setHoveredData}
           />
         ))}
       </svg>
+      {/* Show tooltip */}
+      {hoveredData &&
+        years.map((year) => (
+          <div key={year} className="tooltip">
+            {hoveredData[`${year}_users`]} users
+          </div>
+        ))}
     </div>
   );
 }
