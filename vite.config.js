@@ -15,7 +15,7 @@ export default defineConfig({
       },
     }),
   ],
-  // base: '',
+  base: '/dvs-soti-2022/',
   // root: 'src',
   // build: {
   //   outDir: 'docs',
