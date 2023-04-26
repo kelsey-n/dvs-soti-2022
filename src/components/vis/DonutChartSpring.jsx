@@ -35,6 +35,7 @@ function DonutChartSpring({
   setHoveredTool,
   showTooltip,
   setShowTooltip,
+  setTTPos,
   //   hoveredData,
   //   setHoveredData,
 }) {
@@ -88,7 +89,8 @@ function DonutChartSpring({
         hoveredTool={hoveredTool}
         setHoveredTool={setHoveredTool}
         setShowTooltip={setShowTooltip}
-        // setHoveredData={setHoveredData}
+        pieData={pieData}
+        setTTPos={setTTPos}
       />
     );
   });
@@ -110,6 +112,8 @@ const Slice = ({
   hoveredTool,
   setHoveredTool,
   setShowTooltip,
+  pieData,
+  setTTPos,
   //   setHoveredData,
 }) => {
   const arcGenerator = arc()
@@ -132,15 +136,19 @@ const Slice = ({
     },
   });
 
-  //   // Tooltip
-  //   const tooltipWidth = 150;
-  //   let tooltipPos;
-  //   const calculateTooltipPos = () => {
-  //     const hoveredData = //pieData.filter(
-  //       pieData.filter((d) => d.data.tool === hoveredTool)[0];
-  //     return arcGenerator.centroid(hoveredData);
-  //   };
-  //   tooltipPos = hoveredTool ? calculateTooltipPos() : [0, 0];
+  // Tooltip
+  const calculateTooltipPos = (pieData, year) => {
+    const hoveredData = //pieData.filter(
+      pieData.filter((d) => d.data.tool === hoveredTool)[0];
+    return arcGenerator.centroid(hoveredData);
+  };
+
+  // STALE STATE - old value of state remains before this UE goes into effect, giving
+  // effect of TT jumping from previous hovered position to new one
+  useEffect(() => {
+    if (sliceData.data.tool !== hoveredTool) return;
+    setTTPos(calculateTooltipPos(pieData));
+  }, [hoveredTool]);
 
   const handleMouseOver = () => {
     setHoveredTool(sliceData.data.tool);
@@ -150,7 +158,8 @@ const Slice = ({
   const handleMouseOut = () => {
     setHoveredTool(null);
     setShowTooltip(false);
-    // selectAll('.tooltip').remove();
+    // NOT SURE IF NEEDED - STILL GETTING JUMPING EFFECT FROM OLD POSITION
+    setTTPos([0, 0]);
   };
 
   return (

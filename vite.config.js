@@ -15,6 +15,7 @@ export default defineConfig({
       },
     }),
   ],
+  // Set base to repo name for Vite deploy to GitHub Pages - https://vitejs.dev/guide/static-deploy.html#github-pages
   base: '/dvs-soti-2022/',
   // root: 'src',
   // build: {

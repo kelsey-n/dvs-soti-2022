@@ -11,24 +11,20 @@ const margin = { top: 0, bottom: 0, left: 0, right: 0 };
 const outerRingMargin = 20;
 
 const years = [2022, 2021, 2020, 2019, 2018, 2017];
-let data2022, data2021, data2020, data2019, data2018, data2017;
-const datasetNames = {
-  2022: data2022,
-  2021: data2021,
-  2020: data2020,
-  2019: data2019,
-  2018: data2018,
-  2017: data2017,
-};
 
 function Viz({ sort }) {
   const ref = useRef();
 
   const [hoveredTool, setHoveredTool] = useState(null);
+  // GET RID OF SHOWTOOLTIP - not being used - using hoveredTool instead as an indication that we are hovering
   const [showTooltip, setShowTooltip] = useState(false);
-  //   const [hoveredData, setHoveredData] = useState([0, 0]);
-
-  const datasets = [];
+  // Individual states to send to each donut to set tooltip positions
+  const [TTPos2022, setTTPos2022] = useState([0, 0]);
+  const [TTPos2021, setTTPos2021] = useState([0, 0]);
+  const [TTPos2020, setTTPos2020] = useState([0, 0]);
+  const [TTPos2019, setTTPos2019] = useState([0, 0]);
+  const [TTPos2018, setTTPos2018] = useState([0, 0]);
+  const [TTPos2017, setTTPos2017] = useState([0, 0]);
 
   // Filter & aggregate for each year here (including eventually having dynamic number of tools in 'Other')
   const dataFiltered = data.filter(
@@ -70,7 +66,6 @@ function Viz({ sort }) {
   //     const svg = select(ref.current);
   //   }, []);
 
-  console.log(dataFiltered.filter((d) => d.tool === hoveredTool)[0]);
   const hoveredData = dataFiltered.filter((d) => d.tool === hoveredTool)[0];
 
   return (
@@ -88,15 +83,24 @@ function Viz({ sort }) {
             setHoveredTool={setHoveredTool}
             showTooltip={showTooltip}
             setShowTooltip={setShowTooltip}
-            // hoveredData={hoveredData}
-            // setHoveredData={setHoveredData}
+            setTTPos={eval(`setTTPos${year}`)} // Only send the relevant year's tooltip position setter to that donut
           />
         ))}
       </svg>
+      {/* Extra tooltip here for hovered tool name  */}
+      {hoveredTool && <div className="tooltip">{hoveredTool}</div>}
       {/* Show tooltip */}
-      {hoveredData &&
+      {hoveredTool &&
         years.map((year) => (
-          <div key={year} className="tooltip">
+          <div
+            key={year}
+            className="tooltip"
+            style={{
+              transform: `translate(${eval(`TTPos${year}`)[0] + width / 2}px, ${
+                eval(`TTPos${year}`)[1] + height / 2
+              }px)`,
+            }}
+          >
             {hoveredData[`${year}_users`]} users
           </div>
         ))}
