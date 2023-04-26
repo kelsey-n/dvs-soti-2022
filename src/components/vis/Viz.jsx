@@ -25,6 +25,15 @@ function Viz({ sort }) {
   const [TTPos2019, setTTPos2019] = useState([0, 0]);
   const [TTPos2018, setTTPos2018] = useState([0, 0]);
   const [TTPos2017, setTTPos2017] = useState([0, 0]);
+  // TEMPORARY SOLUTION - otherwise build doesn't pick up ttPos variables
+  useEffect(() => {
+    console.log(TTPos2022, setTTPos2022);
+    console.log(TTPos2021, setTTPos2021);
+    console.log(TTPos2020, setTTPos2020);
+    console.log(TTPos2019, setTTPos2019);
+    console.log(TTPos2018, setTTPos2018);
+    console.log(TTPos2017, setTTPos2017);
+  }, []);
 
   // Filter & aggregate for each year here (including eventually having dynamic number of tools in 'Other')
   const dataFiltered = data.filter(
