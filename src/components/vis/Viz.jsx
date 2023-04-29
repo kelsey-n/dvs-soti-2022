@@ -12,10 +12,31 @@ const outerRingMargin = 20;
 
 const years = [2022, 2021, 2020, 2019, 2018, 2017];
 
-function Viz({ sort }) {
+// TEMPORARY - GET FROM REAL DATA AND PUT AS METADATA
+// const totalRespondents = {
+//   2017: 5000,
+//   2018: 3058,
+//   2019: 6782,
+//   2020: 5348,
+//   2021: 8654,
+//   2022: 48325,
+// };
+const totalRespondents = {
+  2017: 2000,
+  2018: 3000,
+  2019: 4000,
+  2020: 5000,
+  2021: 6000,
+  2022: 7000,
+};
+
+const zeroScaleInnerRad = true; // if false, inner radius scale domain goes from min-max of all values. if true, goes from 0-max.
+
+function Viz({ sort, ringWidth, ringPosition, topNumTools, userInput }) {
   const ref = useRef();
 
   const [hoveredTool, setHoveredTool] = useState(null);
+
   // GET RID OF SHOWTOOLTIP - not being used - using hoveredTool instead as an indication that we are hovering
   const [showTooltip, setShowTooltip] = useState(false);
   // Individual states to send to each donut to set tooltip positions
@@ -25,32 +46,33 @@ function Viz({ sort }) {
   const [TTPos2019, setTTPos2019] = useState([0, 0]);
   const [TTPos2018, setTTPos2018] = useState([0, 0]);
   const [TTPos2017, setTTPos2017] = useState([0, 0]);
-  // TEMPORARY SOLUTION - otherwise build doesn't pick up ttPos variables
-  useEffect(() => {
-    console.log(TTPos2022, setTTPos2022);
-    console.log(TTPos2021, setTTPos2021);
-    console.log(TTPos2020, setTTPos2020);
-    console.log(TTPos2019, setTTPos2019);
-    console.log(TTPos2018, setTTPos2018);
-    console.log(TTPos2017, setTTPos2017);
-  }, []);
+  // TEMPORARY SOLUTION - otherwise build doesn't pick up ttPos variables - they come across as unused
+  // useEffect(() => {
+  //   console.log(TTPos2022, setTTPos2022);
+  //   console.log(TTPos2021, setTTPos2021);
+  //   console.log(TTPos2020, setTTPos2020);
+  //   console.log(TTPos2019, setTTPos2019);
+  //   console.log(TTPos2018, setTTPos2018);
+  //   console.log(TTPos2017, setTTPos2017);
+  // }, []);
 
   // Filter & aggregate for each year here (including eventually having dynamic number of tools in 'Other')
   const dataFiltered = data.filter(
     (d) => d.total_users > dataFilters.minTotalUsers // in general, we will only consider those tools with at least a certain number of users over all 6 years
   );
 
-  //   for (const [year, dataset] of Object.entries(datasetNames)) {
-  //     dataset = dataFiltered;
-  //   }
-  //   console.log(data2019);
-
   // Scales
   const innerRadiusScale = scaleLinear()
-    // .domain([0, max(Object.values(totalToolUsage))])
-    // .range([0, min([width, height]) / 2 - outerRingMargin])
-    .domain(extent(Object.values(totalToolUsage)))
-    .range([20, min([width, height]) / 2 - outerRingMargin]);
+    .domain(
+      ringPosition === 'totalUsage'
+        ? zeroScaleInnerRad
+          ? [0, max(Object.values(totalToolUsage))]
+          : extent(Object.values(totalToolUsage))
+        : zeroScaleInnerRad
+        ? [0, max(Object.values(totalRespondents))]
+        : extent(Object.values(totalRespondents))
+    )
+    .range([0, min([width, height]) / 2 - outerRingMargin]);
 
   const outerRadiusScale = scaleLinear()
     .domain(
@@ -59,8 +81,6 @@ function Viz({ sort }) {
       )
     )
     .range([3, 30]);
-
-  //   console.log(dataFiltered);
 
   //   // Add parent components for all groups of elements
   //   useEffect(() => {
@@ -87,12 +107,15 @@ function Viz({ sort }) {
             year={year}
             innerRadiusScale={innerRadiusScale}
             outerRadiusScale={outerRadiusScale}
+            ringWidth={ringWidth}
             sort={sort}
+            ringPosition={ringPosition}
             hoveredTool={hoveredTool}
             setHoveredTool={setHoveredTool}
             showTooltip={showTooltip}
             setShowTooltip={setShowTooltip}
             setTTPos={eval(`setTTPos${year}`)} // Only send the relevant year's tooltip position setter to that donut
+            userInput={userInput}
           />
         ))}
       </svg>

@@ -59,4 +59,5 @@
   left: 0px;
   /* background-color: lightsteelblue; */
   text-align: left;
+  pointer-events: none;
 }

@@ -23,6 +23,24 @@ const width = 1000;
 const height = 1000;
 const margin = { top: 0, bottom: 0, left: 0, right: 0 };
 
+// TEMPORARY - GET FROM REAL DATA AND PUT AS METADATA
+// const totalRespondents = {
+//   2017: 5000,
+//   2018: 3058,
+//   2019: 6782,
+//   2020: 5348,
+//   2021: 8654,
+//   2022: 48325,
+// };
+const totalRespondents = {
+  2017: 2000,
+  2018: 3000,
+  2019: 4000,
+  2020: 5000,
+  2021: 6000,
+  2022: 7000,
+};
+
 console.log(totalToolUsage);
 
 function DonutChartSpring({
@@ -30,12 +48,15 @@ function DonutChartSpring({
   year,
   innerRadiusScale,
   outerRadiusScale,
+  ringWidth,
   sort,
+  ringPosition,
   hoveredTool,
   setHoveredTool,
   showTooltip,
   setShowTooltip,
   setTTPos,
+  userInput,
   //   hoveredData,
   //   setHoveredData,
 }) {
@@ -62,20 +83,6 @@ function DonutChartSpring({
     .domain(data.map((d) => d.tool))
     .range(schemeSet3);
 
-  //   if (hoveredTool)
-  //     setHoveredData(pieData.filter((d) => d.data.tool === hoveredTool)[0]);
-  //   // Tooltip
-  //   const tooltipWidth = 150;
-  //   let tooltipPos;
-  //   const calculateTooltipPos = () => {
-  //     const hoveredData = //pieData.filter(
-  //       pieData.filter((d) => d.data.tool === hoveredTool)[0];
-  //     return arcGenerator.centroid(hoveredData);
-  //   };
-  //   tooltipPos = hoveredTool ? calculateTooltipPos() : [0, 0];
-
-  //   console.log(pieData);
-
   // Here we will map over the pieData and return a Slice for each row of data
   const allSlices = pieData.map((sliceData, i) => {
     return (
@@ -86,11 +93,14 @@ function DonutChartSpring({
         color={color(sliceData.data.tool)}
         innerRadiusScale={innerRadiusScale}
         outerRadiusScale={outerRadiusScale}
+        ringWidth={ringWidth}
+        ringPosition={ringPosition}
         hoveredTool={hoveredTool}
         setHoveredTool={setHoveredTool}
         setShowTooltip={setShowTooltip}
         pieData={pieData}
         setTTPos={setTTPos}
+        userInput={userInput}
       />
     );
   });
@@ -102,42 +112,83 @@ function DonutChartSpring({
   );
 }
 
-// Then we will create another component that returns a Slice component (eventually, an animated Slice)
+// Then we will create another component that returns an animated Slice component
 const Slice = ({
   sliceData,
   year,
   color,
   innerRadiusScale,
   outerRadiusScale,
+  ringWidth,
+  ringPosition,
   hoveredTool,
   setHoveredTool,
   setShowTooltip,
   pieData,
   setTTPos,
+  userInput,
   //   setHoveredData,
 }) => {
   const arcGenerator = arc()
-    .innerRadius(innerRadiusScale(totalToolUsage[year]))
-    .outerRadius(function (d) {
-      return (
-        innerRadiusScale(totalToolUsage[year]) +
-        outerRadiusScale(sliceData.data[`${year}_meantools`])
-      );
-    })
-    .cornerRadius(3);
+    // .cornerRadius(3) // corner radius not always applied to every arc (esp smaller arcs) - leading to inequal arity for interpolation (some arcs paths have the corner radius arc, some don't and can't be interpolated to/from arcs that do)
+    .outerRadius(
+      ringWidth === 'meanPerYear'
+        ? innerRadiusScale(
+            ringPosition === 'totalUsage'
+              ? totalToolUsage[year]
+              : totalRespondents[year]
+          ) + 24 // this will be a constant for each donut (avg num tools used by respondents each year), but we will scale to determine the number among the diff donuts
+        : innerRadiusScale(
+            ringPosition === 'totalUsage'
+              ? totalToolUsage[year]
+              : totalRespondents[year]
+          ) + outerRadiusScale(sliceData.data[`${year}_meantools`])
+    )
+    .innerRadius(
+      innerRadiusScale(
+        ringPosition === 'totalUsage'
+          ? totalToolUsage[year]
+          : totalRespondents[year]
+      )
+    );
 
   // Inspired by donut data transition here: https://www.react-graph-gallery.com/donut
-  const springProps = useSpring({
+  const sortProps = useSpring({
     config: {
-      //   duration: 2000,
+      // duration: 1200,
     },
     to: {
       pos: [sliceData.startAngle, sliceData.endAngle],
     },
   });
 
+  // Path animation inspired by: https://dev.to/tomdohnal/react-svg-animation-with-react-spring-4-2kba
+  const radiusProps = useSpring({
+    config: {
+      duration: 1200,
+    },
+    d: arcGenerator({
+      innerRadius: innerRadiusScale(
+        ringPosition === 'totalUsage'
+          ? totalToolUsage[year]
+          : totalRespondents[year]
+      ),
+      startAngle: sliceData.startAngle,
+      endAngle: sliceData.endAngle,
+      outerRadius:
+        innerRadiusScale(
+          ringPosition === 'totalUsage'
+            ? totalToolUsage[year]
+            : totalRespondents[year]
+        ) +
+        (ringWidth === 'meanPerTool'
+          ? outerRadiusScale(sliceData.data[`${year}_meantools`])
+          : 24),
+    }),
+  });
+
   // Tooltip
-  const calculateTooltipPos = (pieData, year) => {
+  const calculateTooltipPos = (pieData) => {
     const hoveredData = //pieData.filter(
       pieData.filter((d) => d.data.tool === hoveredTool)[0];
     return arcGenerator.centroid(hoveredData);
@@ -152,7 +203,7 @@ const Slice = ({
 
   const handleMouseOver = () => {
     setHoveredTool(sliceData.data.tool);
-    setShowTooltip(true);
+    // setShowTooltip(true);
     // setHoveredData(sliceData);
   };
   const handleMouseOut = () => {
@@ -164,12 +215,16 @@ const Slice = ({
 
   return (
     <animated.path
-      d={springProps.pos.to((start, end) => {
-        return arcGenerator({
-          startAngle: start,
-          endAngle: end,
-        });
-      })}
+      d={
+        userInput === 'sort'
+          ? sortProps.pos.to((start, end) => {
+              return arcGenerator({
+                startAngle: start,
+                endAngle: end,
+              });
+            })
+          : radiusProps.d
+      }
       fill={color}
       style={{
         opacity:
