@@ -73,7 +73,7 @@ function Controls({
         </select>
       </form>
       {/* Change top number of tools shown */}
-      <form>
+      {/* <form>
         <label htmlFor="num-tools-select">Show top x tools</label>
         <select
           id="num-tools-select"
@@ -87,7 +87,7 @@ function Controls({
           <option value={30}>30</option>
           <option value={20}>20</option>
         </select>
-      </form>
+      </form> */}
     </div>
   );
 }

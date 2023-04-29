@@ -63,9 +63,12 @@ function DonutChartSpring({
   const ref = useRef();
 
   // Default sorting of the pie layout is by value descending (number of users of each tool)
-  const pieGenerator = pie().value(function (d) {
-    return d[`${year}_users`];
-  });
+  const pieGenerator = pie()
+    .value(function (d) {
+      return d[`${year}_users`];
+    })
+    .startAngle(0.05)
+    .endAngle(2 * Math.PI - 0.05);
   // Apply a custom sort function when we change the sort
   // We do this up here because we also need to recalculate tooltip positions based on the new generator
   // This allows the updated pieGenerator to flow into both the sort UE and hovering UE
@@ -74,7 +77,9 @@ function DonutChartSpring({
       return a.tool.localeCompare(b.tool);
     });
   }
+  // TODO: FIX THIS SO PIE GEN DOESN'T RUN EVERY SINGLE TIME IT DOESN'T CHANGE
   const pieData = useMemo(() => {
+    // console.log('pie generator running');
     return pieGenerator(data);
   }, [data]); // TESTING: save pie data here to prevent recalculating it in hovering UE - this seems 'stickier' than recalculating pieGenerator(data) in the hovering UE for tt positioning
 
@@ -82,6 +87,19 @@ function DonutChartSpring({
   const color = scaleOrdinal()
     .domain(data.map((d) => d.tool))
     .range(schemeSet3);
+
+  const textTransitionProps = useSpring({
+    config: {
+      duration: 1200,
+    },
+    fill: 'white',
+    textAnchor: 'middle',
+    y: innerRadiusScale(
+      ringPosition === 'totalUsage'
+        ? -totalToolUsage[year]
+        : -totalRespondents[year]
+    ),
+  });
 
   // Here we will map over the pieData and return a Slice for each row of data
   const allSlices = pieData.map((sliceData, i) => {
@@ -107,7 +125,10 @@ function DonutChartSpring({
 
   return (
     <svg ref={ref} width={width} height={height}>
-      <g transform={`translate(${width / 2}, ${height / 2})`}>{allSlices}</g>
+      <g transform={`translate(${width / 2}, ${height / 2})`}>
+        {allSlices}
+        <animated.text style={{ ...textTransitionProps }}>{year}</animated.text>
+      </g>
     </svg>
   );
 }
@@ -155,7 +176,7 @@ const Slice = ({
   // Inspired by donut data transition here: https://www.react-graph-gallery.com/donut
   const sortProps = useSpring({
     config: {
-      // duration: 1200,
+      duration: 1200,
     },
     to: {
       pos: [sliceData.startAngle, sliceData.endAngle],
@@ -203,6 +224,7 @@ const Slice = ({
 
   const handleMouseOver = () => {
     setHoveredTool(sliceData.data.tool);
+    console.log(year);
     // setShowTooltip(true);
     // setHoveredData(sliceData);
   };
@@ -216,7 +238,7 @@ const Slice = ({
   return (
     <animated.path
       d={
-        userInput === 'sort'
+        userInput === 'sort' || userInput === 'numTools'
           ? sortProps.pos.to((start, end) => {
               return arcGenerator({
                 startAngle: start,
@@ -234,6 +256,7 @@ const Slice = ({
             ? 1
             : 0.3,
         stroke: 'black',
+        // strokeWidth: sliceData.value ? '0.5px' : '0px',
         strokeWidth: '0.5px',
       }}
       onMouseOver={handleMouseOver}

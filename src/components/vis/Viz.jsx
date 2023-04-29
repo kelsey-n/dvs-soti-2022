@@ -60,6 +60,30 @@ function Viz({ sort, ringWidth, ringPosition, topNumTools, userInput }) {
   const dataFiltered = data.filter(
     (d) => d.total_users > dataFilters.minTotalUsers // in general, we will only consider those tools with at least a certain number of users over all 6 years
   );
+  // .sort((a, b) => b.total_users - a.total_users)
+  // .slice(0, topNumTools);
+
+  // console.log(
+  //   dataFiltered
+  //     .sort((a, b) => b.total_users - a.total_users)
+  //     .slice(0, topNumTools)
+  // );
+
+  // For each year, find the top tools by number of users for that year, and set the value for all other tools to undefined
+  // for (const year of years) {
+  //   const tempFilteredData = dataFiltered.sort(
+  //     (a, b) => b[`${year}_users`] - a[`${year}_users`]
+  //   );
+  //   tempFilteredData.forEach((row, idx) => {
+  //     if (idx > topNumTools - 1) {
+  //       row[`${year}_newUsers`] = 0;
+  //       row[`${year}_newMeanTools`] = 0;
+  //     } else {
+  //       row[`${year}_newUsers`] = row[`${year}_users`];
+  //       row[`${year}_newMeanTools`] = row[`${year}_meantools`];
+  //     }
+  //   });
+  // }
 
   // Scales
   const innerRadiusScale = scaleLinear()
