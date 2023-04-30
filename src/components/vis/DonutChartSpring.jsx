@@ -19,8 +19,6 @@ import {
 } from 'd3';
 import totalToolUsage from '../../constants';
 
-const width = 1000;
-const height = 1000;
 const margin = { top: 0, bottom: 0, left: 0, right: 0 };
 
 // TEMPORARY - GET FROM REAL DATA AND PUT AS METADATA
@@ -44,6 +42,8 @@ const totalRespondents = {
 console.log(totalToolUsage);
 
 function DonutChartSpring({
+  width,
+  height,
   data,
   year,
   innerRadiusScale,

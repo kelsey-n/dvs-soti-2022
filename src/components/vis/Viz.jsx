@@ -5,10 +5,8 @@ import DonutChartSpring from './DonutChartSpring';
 import data from '../../assets/mergedOutputAllYears_v6.csv';
 import totalToolUsage, { dataFilters } from '../../constants';
 
-const width = 1000;
-const height = 1000;
 const margin = { top: 0, bottom: 0, left: 0, right: 0 };
-const outerRingMargin = 20;
+const outerRingMargin = 50;
 
 const years = [2022, 2021, 2020, 2019, 2018, 2017];
 
@@ -32,7 +30,15 @@ const totalRespondents = {
 
 const zeroScaleInnerRad = true; // if false, inner radius scale domain goes from min-max of all values. if true, goes from 0-max.
 
-function Viz({ sort, ringWidth, ringPosition, topNumTools, userInput }) {
+function Viz({
+  sort,
+  ringWidth,
+  ringPosition,
+  topNumTools,
+  userInput,
+  width,
+  height,
+}) {
   const ref = useRef();
 
   const [hoveredTool, setHoveredTool] = useState(null);
@@ -47,14 +53,14 @@ function Viz({ sort, ringWidth, ringPosition, topNumTools, userInput }) {
   const [TTPos2018, setTTPos2018] = useState([0, 0]);
   const [TTPos2017, setTTPos2017] = useState([0, 0]);
   // TEMPORARY SOLUTION - otherwise build doesn't pick up ttPos variables - they come across as unused
-  // useEffect(() => {
-  //   console.log(TTPos2022, setTTPos2022);
-  //   console.log(TTPos2021, setTTPos2021);
-  //   console.log(TTPos2020, setTTPos2020);
-  //   console.log(TTPos2019, setTTPos2019);
-  //   console.log(TTPos2018, setTTPos2018);
-  //   console.log(TTPos2017, setTTPos2017);
-  // }, []);
+  useEffect(() => {
+    console.log(TTPos2022, setTTPos2022);
+    console.log(TTPos2021, setTTPos2021);
+    console.log(TTPos2020, setTTPos2020);
+    console.log(TTPos2019, setTTPos2019);
+    console.log(TTPos2018, setTTPos2018);
+    console.log(TTPos2017, setTTPos2017);
+  }, []);
 
   // Filter & aggregate for each year here (including eventually having dynamic number of tools in 'Other')
   const dataFiltered = data.filter(
@@ -127,6 +133,8 @@ function Viz({ sort, ringWidth, ringPosition, topNumTools, userInput }) {
         {years.map((year) => (
           <DonutChartSpring
             key={year}
+            width={width}
+            height={height}
             data={dataFiltered}
             year={year}
             innerRadiusScale={innerRadiusScale}

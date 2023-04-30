@@ -1,8 +1,9 @@
 #root {
   /* max-width: 1280px; */
-  margin: 0 auto;
-  padding: 2rem;
+  /* margin: 0 auto; */
+  /* padding: 2rem; */
   text-align: center;
+  overflow-x: clip;
 }
 
 .logo {
@@ -47,6 +48,13 @@
   display: flex;
   flex-direction: row;
   gap: 20px;
+}
+
+.intro-text {
+  position: absolute;
+  bottom: 50%;
+  left: 20%;
+  right: 20%;
 }
 
 .viz-svg-container {
