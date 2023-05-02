@@ -2,19 +2,23 @@ import { useEffect, useState, useRef } from 'react';
 import { useScroll, animated, useSpring } from 'react-spring';
 import Viz from './components/vis/Viz';
 import Controls from './components/controls/Controls';
-import data from './assets/mergedOutputAllYears_v6.csv';
 import './App.css';
-import { select } from 'd3';
 import { introText } from './constants';
 
-const sortOptions = { toolName: 'tool name', toolUsage: 'tool usage' };
+const sortOptions = {
+  toolName: 'tool name',
+  toolUsage: 'tool usage',
+  absGrowth: 'growth (# users)',
+  percGrowthUsers: 'growth (% respondents)',
+};
 const ringWidthOptions = {
   meanPerTool: 'users of this tool',
   meanPerYear: 'all respondents of this year',
 };
 const ringPositionOptions = {
-  totalUsage: 'users of this tool',
-  totalRespondents: 'all respondents of this year',
+  totalUsage: 'total usage per year',
+  // totalRespondents: 'total respondents per year',
+  year: 'years',
 };
 
 const controlsWidth = 182;

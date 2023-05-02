@@ -1,32 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
-import { max, select, scaleLinear, min, extent } from 'd3';
-import DonutChart from './DonutChart';
+import { max, select, scaleBand, scaleLinear, min, extent } from 'd3';
 import DonutChartSpring from './DonutChartSpring';
-import data from '../../assets/mergedOutputAllYears_v6.csv';
-import totalToolUsage, { dataFilters } from '../../constants';
+import data from '../../assets/mergedOutputAllYears_edited_5_2.csv';
+import metadata from '../../assets/metadata_5_2_index.csv';
+import { dataFilters } from '../../constants';
 
 const margin = { top: 0, bottom: 0, left: 0, right: 0 };
 const outerRingMargin = 50;
 
 const years = [2022, 2021, 2020, 2019, 2018, 2017];
-
-// TEMPORARY - GET FROM REAL DATA AND PUT AS METADATA
-// const totalRespondents = {
-//   2017: 5000,
-//   2018: 3058,
-//   2019: 6782,
-//   2020: 5348,
-//   2021: 8654,
-//   2022: 48325,
-// };
-const totalRespondents = {
-  2017: 2000,
-  2018: 3000,
-  2019: 4000,
-  2020: 5000,
-  2021: 6000,
-  2022: 7000,
-};
 
 const zeroScaleInnerRad = true; // if false, inner radius scale domain goes from min-max of all values. if true, goes from 0-max.
 
@@ -64,7 +46,7 @@ function Viz({
 
   // Filter & aggregate for each year here (including eventually having dynamic number of tools in 'Other')
   const dataFiltered = data.filter(
-    (d) => d.total_users > dataFilters.minTotalUsers // in general, we will only consider those tools with at least a certain number of users over all 6 years
+    (d) => d.total_users >= dataFilters.minTotalUsers // in general, we will only consider those tools with at least a certain number of users over all 6 years
   );
   // .sort((a, b) => b.total_users - a.total_users)
   // .slice(0, topNumTools);
@@ -92,25 +74,55 @@ function Viz({
   // }
 
   // Scales
-  const innerRadiusScale = scaleLinear()
-    .domain(
-      ringPosition === 'totalUsage'
-        ? zeroScaleInnerRad
-          ? [0, max(Object.values(totalToolUsage))]
-          : extent(Object.values(totalToolUsage))
-        : zeroScaleInnerRad
-        ? [0, max(Object.values(totalRespondents))]
-        : extent(Object.values(totalRespondents))
-    )
-    .range([0, min([width, height]) / 2 - outerRingMargin]);
+  let innerRadiusScale;
+  const innerRadiusRange =
+    ringPosition === 'year'
+      ? [
+          min([width, height]) / 2 / 6,
+          min([width, height]) / 2 -
+            outerRingMargin +
+            min([width, height]) / 2 / 6,
+        ]
+      : [0, min([width, height]) / 2 - outerRingMargin];
+
+  if (ringPosition === 'year') {
+    innerRadiusScale = scaleBand()
+      .domain([2017, 2018, 2019, 2020, 2021, 2022])
+      .range(innerRadiusRange);
+  } else {
+    innerRadiusScale = scaleLinear()
+      .domain(
+        ringPosition === 'totalUsage'
+          ? zeroScaleInnerRad
+            ? [0, max(metadata.map((d) => d.toolusage))]
+            : extent(metadata.map((d) => d.toolusage))
+          : zeroScaleInnerRad
+          ? [0, max(metadata.map((d) => d.respondents))]
+          : extent(metadata.map((d) => d.respondents))
+      )
+      .range(innerRadiusRange);
+  }
 
   const outerRadiusScale = scaleLinear()
+    // .domain(
+    //   extent(
+    //     dataFiltered.map((d) => years.map((y) => d[`${y}_meantools`])).flat()
+    //   )
+    // )
+    // .range([3, 30]);
     .domain(
-      extent(
-        dataFiltered.map((d) => years.map((y) => d[`${y}_meantools`])).flat()
-      )
+      ringWidth === 'meanPerTool'
+        ? [
+            0,
+            max(
+              dataFiltered
+                .map((d) => years.map((y) => d[`${y}_meantools`]))
+                .flat()
+            ),
+          ]
+        : [0, max(metadata.map((d) => d.meantools))]
     )
-    .range([3, 30]);
+    .range([0, 30]);
 
   //   // Add parent components for all groups of elements
   //   useEffect(() => {
@@ -136,6 +148,7 @@ function Viz({
             width={width}
             height={height}
             data={dataFiltered}
+            metadata={metadata}
             year={year}
             innerRadiusScale={innerRadiusScale}
             outerRadiusScale={outerRadiusScale}
@@ -153,7 +166,7 @@ function Viz({
       </svg>
       {/* Extra tooltip here for hovered tool name  */}
       {hoveredTool && <div className="tooltip">{hoveredTool}</div>}
-      {/* Show tooltip */}
+      {/* Show tooltip for each donut */}
       {hoveredTool &&
         years.map((year) => (
           <div

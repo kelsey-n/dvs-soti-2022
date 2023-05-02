@@ -17,34 +17,14 @@ import {
   selectAll,
   local,
 } from 'd3';
-import totalToolUsage from '../../constants';
 
 const margin = { top: 0, bottom: 0, left: 0, right: 0 };
-
-// TEMPORARY - GET FROM REAL DATA AND PUT AS METADATA
-// const totalRespondents = {
-//   2017: 5000,
-//   2018: 3058,
-//   2019: 6782,
-//   2020: 5348,
-//   2021: 8654,
-//   2022: 48325,
-// };
-const totalRespondents = {
-  2017: 2000,
-  2018: 3000,
-  2019: 4000,
-  2020: 5000,
-  2021: 6000,
-  2022: 7000,
-};
-
-console.log(totalToolUsage);
 
 function DonutChartSpring({
   width,
   height,
   data,
+  metadata,
   year,
   innerRadiusScale,
   outerRadiusScale,
@@ -76,7 +56,16 @@ function DonutChartSpring({
     pieGenerator.sort(function (a, b) {
       return a.tool.localeCompare(b.tool);
     });
+  } else if (sort === 'absGrowth') {
+    pieGenerator.sort(function (a, b) {
+      return b.absolutegrowth - a.absolutegrowth;
+    });
+  } else if (sort === 'percGrowthUsers') {
+    pieGenerator.sort(function (a, b) {
+      return b.percgrowth_responders - a.percgrowth_responders;
+    });
   }
+
   // TODO: FIX THIS SO PIE GEN DOESN'T RUN EVERY SINGLE TIME IT DOESN'T CHANGE
   const pieData = useMemo(() => {
     // console.log('pie generator running');
@@ -94,18 +83,18 @@ function DonutChartSpring({
     },
     fill: 'white',
     textAnchor: 'middle',
-    y: innerRadiusScale(
+    y: -innerRadiusScale(
       ringPosition === 'totalUsage'
-        ? -totalToolUsage[year]
-        : -totalRespondents[year]
+        ? metadata.filter((d) => d.year === year)[0].toolusage
+        : year //-metadata.filter((d) => d.year === year)[0].respondents
     ),
   });
 
   // Here we will map over the pieData and return a Slice for each row of data
-  const allSlices = pieData.map((sliceData, i) => {
+  const allSlices = pieData.map((sliceData) => {
     return (
       <Slice
-        key={sliceData.data.name}
+        key={sliceData.data.tool}
         sliceData={sliceData}
         year={year}
         color={color(sliceData.data.tool)}
@@ -119,6 +108,7 @@ function DonutChartSpring({
         pieData={pieData}
         setTTPos={setTTPos}
         userInput={userInput}
+        metadata={metadata}
       />
     );
   });
@@ -148,6 +138,7 @@ const Slice = ({
   pieData,
   setTTPos,
   userInput,
+  metadata,
   //   setHoveredData,
 }) => {
   const arcGenerator = arc()
@@ -156,20 +147,20 @@ const Slice = ({
       ringWidth === 'meanPerYear'
         ? innerRadiusScale(
             ringPosition === 'totalUsage'
-              ? totalToolUsage[year]
-              : totalRespondents[year]
-          ) + 24 // this will be a constant for each donut (avg num tools used by respondents each year), but we will scale to determine the number among the diff donuts
+              ? metadata.filter((d) => d.year === year)[0].toolusage
+              : year //metadata.filter((d) => d.year === year)[0].respondents
+          ) + metadata.filter((d) => d.year === year)[0].meantools // this will be a constant for each donut (avg num tools used by respondents each year), but we will scale to determine the number among the diff donuts
         : innerRadiusScale(
             ringPosition === 'totalUsage'
-              ? totalToolUsage[year]
-              : totalRespondents[year]
+              ? metadata.filter((d) => d.year === year)[0].toolusage
+              : year //metadata.filter((d) => d.year === year)[0].respondents
           ) + outerRadiusScale(sliceData.data[`${year}_meantools`])
     )
     .innerRadius(
       innerRadiusScale(
         ringPosition === 'totalUsage'
-          ? totalToolUsage[year]
-          : totalRespondents[year]
+          ? metadata.filter((d) => d.year === year)[0].toolusage
+          : year //metadata.filter((d) => d.year === year)[0].respondents
       )
     );
 
@@ -191,20 +182,20 @@ const Slice = ({
     d: arcGenerator({
       innerRadius: innerRadiusScale(
         ringPosition === 'totalUsage'
-          ? totalToolUsage[year]
-          : totalRespondents[year]
+          ? metadata.filter((d) => d.year === year)[0].toolusage
+          : year //metadata.filter((d) => d.year === year)[0].respondents
       ),
       startAngle: sliceData.startAngle,
       endAngle: sliceData.endAngle,
       outerRadius:
         innerRadiusScale(
           ringPosition === 'totalUsage'
-            ? totalToolUsage[year]
-            : totalRespondents[year]
+            ? metadata.filter((d) => d.year === year)[0].toolusage
+            : year //metadata.filter((d) => d.year === year)[0].respondents
         ) +
         (ringWidth === 'meanPerTool'
           ? outerRadiusScale(sliceData.data[`${year}_meantools`])
-          : 24),
+          : metadata.filter((d) => d.year === year)[0].meantools),
     }),
   });
 
@@ -256,7 +247,6 @@ const Slice = ({
             ? 1
             : 0.3,
         stroke: 'black',
-        // strokeWidth: sliceData.value ? '0.5px' : '0px',
         strokeWidth: '0.5px',
       }}
       onMouseOver={handleMouseOver}

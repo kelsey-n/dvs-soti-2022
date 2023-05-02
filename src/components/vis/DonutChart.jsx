@@ -16,13 +16,10 @@ import {
   selectAll,
   local,
 } from 'd3';
-import totalToolUsage from '../../constants';
 
 const width = 1000;
 const height = 1000;
 const margin = { top: 0, bottom: 0, left: 0, right: 0 };
-
-console.log(totalToolUsage);
 
 // THOUGHTS :
 // 3 UEs
