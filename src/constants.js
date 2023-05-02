@@ -2,6 +2,8 @@ export const dataFilters = {
   minTotalUsers: 30,
 };
 
+export const outerRadiusDefault = 15;
+
 // TRY making corner radius dependent on users...? maybe not though
 
 // CHECK arcGenerator of 2019 powerpoint, filtering out users of 1000. Arity of output must be equal - check what EXACTLY the arc generator returns for powerpoint 2019 both before and after inner radius change

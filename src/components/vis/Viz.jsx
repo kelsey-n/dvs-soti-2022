@@ -73,7 +73,7 @@ function Viz({
   //   });
   // }
 
-  // Scales
+  // Scales for ring position (inner radius) & width (outer radius)
   let innerRadiusScale;
   const innerRadiusRange =
     ringPosition === 'year'
@@ -103,25 +103,24 @@ function Viz({
       .range(innerRadiusRange);
   }
 
+  // const outerRadiusScale = scaleLinear()
+  //   .domain(
+  //     ringWidth === 'meanPerTool'
+  //       ? [
+  //           0,
+  //           max(
+  //             dataFiltered
+  //               .map((d) => years.map((y) => d[`${y}_meantools`]))
+  //               .flat()
+  //           ),
+  //         ]
+  //       : [0, max(metadata.map((d) => d.meantools))]
+  //   )
+  //   .range([0, 30]);
+
+  // Only set the outer radius scale (to be proportional to total tool usage) when we position rings by year
   const outerRadiusScale = scaleLinear()
-    // .domain(
-    //   extent(
-    //     dataFiltered.map((d) => years.map((y) => d[`${y}_meantools`])).flat()
-    //   )
-    // )
-    // .range([3, 30]);
-    .domain(
-      ringWidth === 'meanPerTool'
-        ? [
-            0,
-            max(
-              dataFiltered
-                .map((d) => years.map((y) => d[`${y}_meantools`]))
-                .flat()
-            ),
-          ]
-        : [0, max(metadata.map((d) => d.meantools))]
-    )
+    .domain([0, max(metadata.map((d) => d.toolusage))])
     .range([0, 30]);
 
   //   // Add parent components for all groups of elements
@@ -152,7 +151,6 @@ function Viz({
             year={year}
             innerRadiusScale={innerRadiusScale}
             outerRadiusScale={outerRadiusScale}
-            ringWidth={ringWidth}
             sort={sort}
             ringPosition={ringPosition}
             hoveredTool={hoveredTool}

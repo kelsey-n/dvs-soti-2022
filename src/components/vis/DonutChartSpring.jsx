@@ -17,6 +17,7 @@ import {
   selectAll,
   local,
 } from 'd3';
+import { outerRadiusDefault } from '../../constants';
 
 const margin = { top: 0, bottom: 0, left: 0, right: 0 };
 
@@ -28,7 +29,6 @@ function DonutChartSpring({
   year,
   innerRadiusScale,
   outerRadiusScale,
-  ringWidth,
   sort,
   ringPosition,
   hoveredTool,
@@ -79,14 +79,14 @@ function DonutChartSpring({
 
   const textTransitionProps = useSpring({
     config: {
-      duration: 1200,
+      // duration: 1200,
     },
     fill: 'white',
     textAnchor: 'middle',
     y: -innerRadiusScale(
-      ringPosition === 'totalUsage'
-        ? metadata.filter((d) => d.year === year)[0].toolusage
-        : year //-metadata.filter((d) => d.year === year)[0].respondents
+      ringPosition === 'year'
+        ? year
+        : metadata.filter((d) => d.year === year)[0].toolusage
     ),
   });
 
@@ -100,7 +100,6 @@ function DonutChartSpring({
         color={color(sliceData.data.tool)}
         innerRadiusScale={innerRadiusScale}
         outerRadiusScale={outerRadiusScale}
-        ringWidth={ringWidth}
         ringPosition={ringPosition}
         hoveredTool={hoveredTool}
         setHoveredTool={setHoveredTool}
@@ -130,7 +129,6 @@ const Slice = ({
   color,
   innerRadiusScale,
   outerRadiusScale,
-  ringWidth,
   ringPosition,
   hoveredTool,
   setHoveredTool,
@@ -143,31 +141,30 @@ const Slice = ({
 }) => {
   const arcGenerator = arc()
     // .cornerRadius(3) // corner radius not always applied to every arc (esp smaller arcs) - leading to inequal arity for interpolation (some arcs paths have the corner radius arc, some don't and can't be interpolated to/from arcs that do)
-    .outerRadius(
-      ringWidth === 'meanPerYear'
-        ? innerRadiusScale(
-            ringPosition === 'totalUsage'
-              ? metadata.filter((d) => d.year === year)[0].toolusage
-              : year //metadata.filter((d) => d.year === year)[0].respondents
-          ) + metadata.filter((d) => d.year === year)[0].meantools // this will be a constant for each donut (avg num tools used by respondents each year), but we will scale to determine the number among the diff donuts
-        : innerRadiusScale(
-            ringPosition === 'totalUsage'
-              ? metadata.filter((d) => d.year === year)[0].toolusage
-              : year //metadata.filter((d) => d.year === year)[0].respondents
-          ) + outerRadiusScale(sliceData.data[`${year}_meantools`])
-    )
     .innerRadius(
       innerRadiusScale(
-        ringPosition === 'totalUsage'
-          ? metadata.filter((d) => d.year === year)[0].toolusage
-          : year //metadata.filter((d) => d.year === year)[0].respondents
+        ringPosition === 'year'
+          ? year
+          : metadata.filter((d) => d.year === year)[0].toolusage
       )
+    )
+    .outerRadius(
+      innerRadiusScale(
+        ringPosition === 'year'
+          ? year
+          : metadata.filter((d) => d.year === year)[0].toolusage
+      ) +
+        (ringPosition === 'year'
+          ? outerRadiusScale(
+              metadata.filter((d) => d.year === year)[0].toolusage
+            )
+          : outerRadiusDefault)
     );
 
   // Inspired by donut data transition here: https://www.react-graph-gallery.com/donut
   const sortProps = useSpring({
     config: {
-      duration: 1200,
+      // duration: 1200,
     },
     to: {
       pos: [sliceData.startAngle, sliceData.endAngle],
@@ -177,25 +174,11 @@ const Slice = ({
   // Path animation inspired by: https://dev.to/tomdohnal/react-svg-animation-with-react-spring-4-2kba
   const radiusProps = useSpring({
     config: {
-      duration: 1200,
+      // duration: 1200,
     },
     d: arcGenerator({
-      innerRadius: innerRadiusScale(
-        ringPosition === 'totalUsage'
-          ? metadata.filter((d) => d.year === year)[0].toolusage
-          : year //metadata.filter((d) => d.year === year)[0].respondents
-      ),
       startAngle: sliceData.startAngle,
       endAngle: sliceData.endAngle,
-      outerRadius:
-        innerRadiusScale(
-          ringPosition === 'totalUsage'
-            ? metadata.filter((d) => d.year === year)[0].toolusage
-            : year //metadata.filter((d) => d.year === year)[0].respondents
-        ) +
-        (ringWidth === 'meanPerTool'
-          ? outerRadiusScale(sliceData.data[`${year}_meantools`])
-          : metadata.filter((d) => d.year === year)[0].meantools),
     }),
   });
 
@@ -215,7 +198,6 @@ const Slice = ({
 
   const handleMouseOver = () => {
     setHoveredTool(sliceData.data.tool);
-    console.log(year);
     // setShowTooltip(true);
     // setHoveredData(sliceData);
   };

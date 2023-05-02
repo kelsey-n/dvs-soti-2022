@@ -11,6 +11,7 @@ const sortOptions = {
   absGrowth: 'growth (# users)',
   percGrowthUsers: 'growth (% respondents)',
 };
+// NOT USING
 const ringWidthOptions = {
   meanPerTool: 'users of this tool',
   meanPerYear: 'all respondents of this year',
@@ -119,7 +120,6 @@ function App() {
         </div>
         <Viz
           sort={sort}
-          ringWidth={ringWidth}
           ringPosition={ringPosition}
           topNumTools={topNumTools}
           userInput={userInput}

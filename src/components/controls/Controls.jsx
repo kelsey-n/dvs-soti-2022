@@ -35,7 +35,7 @@ function Controls({
         </select>
       </form>
       {/* Change ring width */}
-      <form>
+      {/* <form>
         <label htmlFor="ring-width-select">
           Ring width corresponds to average # tools used by
         </label>{' '}
@@ -53,7 +53,7 @@ function Controls({
             </option>
           ))}
         </select>
-      </form>
+      </form> */}
       {/* Change ring position */}
       <form>
         <label htmlFor="ring-position-select">Position rings by</label>
