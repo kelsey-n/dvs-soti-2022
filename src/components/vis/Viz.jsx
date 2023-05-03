@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { max, select, scaleBand, scaleLinear, min, extent } from 'd3';
 import DonutChartSpring from './DonutChartSpring';
-import data from '../../assets/mergedOutputAllYears_edited_5_2.csv';
+import data from '../../assets/mergedOutputAllYears_edited_5_3_index.csv';
 import metadata from '../../assets/metadata_5_2_index.csv';
 import { dataFilters } from '../../constants';
 
