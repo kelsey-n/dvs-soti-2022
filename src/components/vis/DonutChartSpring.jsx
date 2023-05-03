@@ -17,9 +17,8 @@ import {
   selectAll,
   local,
 } from 'd3';
-import { outerRadiusDefault } from '../../constants';
 
-const margin = { top: 0, bottom: 0, left: 0, right: 0 };
+const margin = { top: 20, bottom: 20, left: 20, right: 20 };
 
 function DonutChartSpring({
   width,
@@ -29,6 +28,7 @@ function DonutChartSpring({
   year,
   innerRadiusScale,
   outerRadiusScale,
+  outerRadiusDefault,
   sort,
   ringPosition,
   hoveredTool,
@@ -100,6 +100,7 @@ function DonutChartSpring({
         color={color(sliceData.data.tool)}
         innerRadiusScale={innerRadiusScale}
         outerRadiusScale={outerRadiusScale}
+        outerRadiusDefault={outerRadiusDefault}
         ringPosition={ringPosition}
         hoveredTool={hoveredTool}
         setHoveredTool={setHoveredTool}
@@ -129,6 +130,7 @@ const Slice = ({
   color,
   innerRadiusScale,
   outerRadiusScale,
+  outerRadiusDefault,
   ringPosition,
   hoveredTool,
   setHoveredTool,
@@ -156,7 +158,7 @@ const Slice = ({
       ) +
         (ringPosition === 'year'
           ? outerRadiusScale(
-              metadata.filter((d) => d.year === year)[0].toolusage
+              metadata.filter((d) => d.year === year)[0].toolusage // outer radius is proportional to tool usage for that year when we order rings by year
             )
           : outerRadiusDefault)
     );

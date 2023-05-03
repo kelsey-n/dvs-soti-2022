@@ -99,3 +99,11 @@
   background-color: #242424;
   width: fit-content;
 }
+
+@media screen and (max-width: 768px) {
+  .intro-text {
+    top: 5%;
+    left: 5%;
+    right: 5%;
+  }
+}

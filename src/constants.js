@@ -1,8 +1,6 @@
 export const dataFilters = {
-  minTotalUsers: 30,
+  minTotalUsers: 250,
 };
-
-export const outerRadiusDefault = 15;
 
 // TRY making corner radius dependent on users...? maybe not though
 

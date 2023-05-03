@@ -5,7 +5,8 @@ import data from '../../assets/mergedOutputAllYears_edited_5_3_index.csv';
 import metadata from '../../assets/metadata_5_2_index.csv';
 import { dataFilters } from '../../constants';
 
-const margin = { top: 0, bottom: 0, left: 0, right: 0 };
+const margin = { top: 40, bottom: 40, left: 40, right: 40 };
+// const margin = { top: 0, bottom: 0, left: 0, right: 0 };
 const outerRingMargin = 50;
 
 const years = [2022, 2021, 2020, 2019, 2018, 2017];
@@ -22,6 +23,12 @@ function Viz({
   height,
 }) {
   const ref = useRef();
+  const svgRadius =
+    min([
+      width - margin.left - margin.right,
+      height - margin.top - margin.bottom,
+    ]) / 2;
+  const minTotalUsers = window.innerWidth < 1024 ? 250 : 30;
 
   const [hoveredTool, setHoveredTool] = useState(null);
 
@@ -35,18 +42,18 @@ function Viz({
   const [TTPos2018, setTTPos2018] = useState([0, 0]);
   const [TTPos2017, setTTPos2017] = useState([0, 0]);
   // TEMPORARY SOLUTION - otherwise build doesn't pick up ttPos variables - they come across as unused
-  // useEffect(() => {
-  //   console.log(TTPos2022, setTTPos2022);
-  //   console.log(TTPos2021, setTTPos2021);
-  //   console.log(TTPos2020, setTTPos2020);
-  //   console.log(TTPos2019, setTTPos2019);
-  //   console.log(TTPos2018, setTTPos2018);
-  //   console.log(TTPos2017, setTTPos2017);
-  // }, []);
+  useEffect(() => {
+    console.log(TTPos2022, setTTPos2022);
+    console.log(TTPos2021, setTTPos2021);
+    console.log(TTPos2020, setTTPos2020);
+    console.log(TTPos2019, setTTPos2019);
+    console.log(TTPos2018, setTTPos2018);
+    console.log(TTPos2017, setTTPos2017);
+  }, []);
 
   // Filter & aggregate for each year here (including eventually having dynamic number of tools in 'Other')
   const dataFiltered = data.filter(
-    (d) => d.total_users >= dataFilters.minTotalUsers // in general, we will only consider those tools with at least a certain number of users over all 6 years
+    (d) => d.total_users >= minTotalUsers // in general, we will only consider those tools with at least a certain number of users over all 6 years - and reduce this number on smaller screens
   );
   // .sort((a, b) => b.total_users - a.total_users)
   // .slice(0, topNumTools);
@@ -74,21 +81,18 @@ function Viz({
   // }
 
   // Scales for ring position (inner radius) & width (outer radius)
-  let innerRadiusScale;
+  let innerRadiusScale, outerRadiusDefault, innerRadiusBandwidth;
   const innerRadiusRange =
     ringPosition === 'year'
-      ? [
-          min([width, height]) / 2 / 6,
-          min([width, height]) / 2 -
-            outerRingMargin +
-            min([width, height]) / 2 / 6,
-        ]
-      : [0, min([width, height]) / 2 - outerRingMargin];
+      ? [svgRadius / 6, svgRadius - outerRingMargin + svgRadius / 6]
+      : [0, svgRadius - outerRingMargin];
 
   if (ringPosition === 'year') {
     innerRadiusScale = scaleBand()
       .domain([2017, 2018, 2019, 2020, 2021, 2022])
       .range(innerRadiusRange);
+    // Find the  distance between any 2 years in the years view (scaleBand so this should be equal)
+    innerRadiusBandwidth = innerRadiusScale.bandwidth();
   } else {
     innerRadiusScale = scaleLinear()
       .domain(
@@ -101,27 +105,23 @@ function Viz({
           : extent(metadata.map((d) => d.respondents))
       )
       .range(innerRadiusRange);
+    // Find the minimum distance between consecutive years in the tool usage view
+    const ranges = [2018, 2017, 2020, 2019, 2022, 2021].map((d) =>
+      innerRadiusScale(metadata.filter((r) => r.year === d)[0].toolusage)
+    );
+    const differences = [];
+    for (let i = 1; i < ranges.length; i++) {
+      const difference = Math.abs(ranges[i] - ranges[i - 1]);
+      differences.push(difference);
+    }
+    // Set the default radius to slightly below this min distance (since we have 2 rings that are very close together)
+    outerRadiusDefault = Math.floor(min(differences));
   }
-
-  // const outerRadiusScale = scaleLinear()
-  //   .domain(
-  //     ringWidth === 'meanPerTool'
-  //       ? [
-  //           0,
-  //           max(
-  //             dataFiltered
-  //               .map((d) => years.map((y) => d[`${y}_meantools`]))
-  //               .flat()
-  //           ),
-  //         ]
-  //       : [0, max(metadata.map((d) => d.meantools))]
-  //   )
-  //   .range([0, 30]);
 
   // Only set the outer radius scale (to be proportional to total tool usage) when we position rings by year
   const outerRadiusScale = scaleLinear()
     .domain([0, max(metadata.map((d) => d.toolusage))])
-    .range([0, 30]);
+    .range([0, innerRadiusBandwidth < 30 ? innerRadiusBandwidth : 30]);
 
   //   // Add parent components for all groups of elements
   //   useEffect(() => {
@@ -151,6 +151,7 @@ function Viz({
             year={year}
             innerRadiusScale={innerRadiusScale}
             outerRadiusScale={outerRadiusScale}
+            outerRadiusDefault={outerRadiusDefault}
             sort={sort}
             ringPosition={ringPosition}
             hoveredTool={hoveredTool}

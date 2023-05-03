@@ -30,7 +30,7 @@ function App() {
 
   const [sort, setSort] = useState('toolUsage');
   const [ringWidth, setRingWidth] = useState('meanPerTool');
-  const [ringPosition, setRingPosition] = useState('totalUsage');
+  const [ringPosition, setRingPosition] = useState('year');
   const [topNumTools, setTopNumTools] = useState(40);
   const [userInput, setUserInput] = useState(null);
 
@@ -39,7 +39,6 @@ function App() {
   );
 
   const controlsWidth = mobile ? 0 : min([450, window.innerWidth / 3]);
-  const controlsElem = document.querySelector('.controls-wrapper-parent');
   const controlsHeight = mobile ? (window.innerWidth < 415 ? 283 : 244) : 0; // not best way to do this
 
   const [dimensions, setDimensions] = useState({
@@ -101,13 +100,13 @@ function App() {
           transform: scrollYProgress.to((val) =>
             !mobile
               ? `translate(${
-                  (-dimensions.width / 2) * val + dimensions.width / 2
+                  (-dimensions.width / 1.5) * val + dimensions.width / 1.5
                 }px, ${
-                  (window.innerHeight + dimensions.height / 2) * val -
-                  dimensions.height / 2
+                  (window.innerHeight + dimensions.height / 1.5) * val -
+                  dimensions.height / 1.5
                 }px) rotate(${-90 * val + 90}deg)`
               : `translate(${
-                  (-dimensions.width / 2) * val + dimensions.width / 2
+                  (-dimensions.width / 1.5) * val + dimensions.width / 1.5
                 }px, ${
                   (window.innerHeight +
                     controlsHeight +
