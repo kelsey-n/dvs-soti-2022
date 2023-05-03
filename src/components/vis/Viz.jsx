@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { max, select, scaleBand, scaleLinear, min, extent } from 'd3';
 import DonutChartSpring from './DonutChartSpring';
 import data from '../../assets/mergedOutputAllYears_edited_5_3_index.csv';
@@ -31,15 +31,13 @@ function Viz({
 
   const [hoveredTool, setHoveredTool] = useState(null);
 
-  // GET RID OF SHOWTOOLTIP - not being used - using hoveredTool instead as an indication that we are hovering
-  const [showTooltip, setShowTooltip] = useState(false);
   // Individual states to send to each donut to set tooltip positions
-  const [TTPos2022, setTTPos2022] = useState([0, 0]);
-  const [TTPos2021, setTTPos2021] = useState([0, 0]);
-  const [TTPos2020, setTTPos2020] = useState([0, 0]);
-  const [TTPos2019, setTTPos2019] = useState([0, 0]);
-  const [TTPos2018, setTTPos2018] = useState([0, 0]);
-  const [TTPos2017, setTTPos2017] = useState([0, 0]);
+  const [TTPos2022, setTTPos2022] = useState(null);
+  const [TTPos2021, setTTPos2021] = useState(null);
+  const [TTPos2020, setTTPos2020] = useState(null);
+  const [TTPos2019, setTTPos2019] = useState(null);
+  const [TTPos2018, setTTPos2018] = useState(null);
+  const [TTPos2017, setTTPos2017] = useState(null);
   // TEMPORARY SOLUTION - otherwise build doesn't pick up ttPos variables - they come across as unused
   useEffect(() => {
     console.log(TTPos2022, setTTPos2022);
@@ -131,10 +129,6 @@ function Viz({
   //     one(svg, 'g', 'bar-listing-parent');
   //   });
 
-  //   useEffect(() => {
-  //     const svg = select(ref.current);
-  //   }, []);
-
   const hoveredData = dataFiltered.filter((d) => d.tool === hoveredTool)[0];
 
   return (
@@ -155,9 +149,16 @@ function Viz({
             ringPosition={ringPosition}
             hoveredTool={hoveredTool}
             setHoveredTool={setHoveredTool}
-            showTooltip={showTooltip}
-            setShowTooltip={setShowTooltip}
-            setTTPos={eval(`setTTPos${year}`)} // Only send the relevant year's tooltip position setter to that donut
+            setTTPos={eval(`setTTPos${year}`)} // Only send the relevant year's tooltip position setter to update in that donut
+            // Array of all tt position setters to set all to null on mouseOut - prevents tooltip jumping before all states updated
+            allSetTTPos={[
+              setTTPos2017,
+              setTTPos2018,
+              setTTPos2019,
+              setTTPos2020,
+              setTTPos2021,
+              setTTPos2022,
+            ]}
             userInput={userInput}
           />
         ))}
@@ -166,21 +167,25 @@ function Viz({
       {hoveredTool && <div className="tooltip">{hoveredTool}</div>}
       {/* Show tooltip for each donut */}
       {hoveredTool &&
-        years.map((year) => (
-          <div
-            key={year}
-            className="tooltip"
-            style={{
-              transform: `translate(${eval(`TTPos${year}`)[0] + width / 2}px, ${
-                eval(`TTPos${year}`)[1] + height / 2
-              }px)`,
-            }}
-          >
-            {hoveredData[`${year}_users`]} users
-          </div>
-        ))}
+        years.map((year) =>
+          // Only render each ring's tooltip if not null - prevents old state of tooltip leading to 'jumping' effect
+          eval(`TTPos${year}`) !== null ? (
+            <div
+              key={year}
+              className="tooltip"
+              style={{
+                transform: `translate(${
+                  eval(`TTPos${year}`)[0] + width / 2
+                }px, ${eval(`TTPos${year}`)[1] + height / 2}px)`,
+              }}
+            >
+              {hoveredData[`${year}_users`]} users
+            </div>
+          ) : null
+        )}
     </div>
   );
 }
 
-export default Viz;
+const MemoizedViz = memo(Viz);
+export default MemoizedViz;

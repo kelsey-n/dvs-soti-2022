@@ -33,12 +33,9 @@ function DonutChartSpring({
   ringPosition,
   hoveredTool,
   setHoveredTool,
-  showTooltip,
-  setShowTooltip,
   setTTPos,
+  allSetTTPos,
   userInput,
-  //   hoveredData,
-  //   setHoveredData,
 }) {
   const ref = useRef();
 
@@ -102,9 +99,9 @@ function DonutChartSpring({
         ringPosition={ringPosition}
         hoveredTool={hoveredTool}
         setHoveredTool={setHoveredTool}
-        setShowTooltip={setShowTooltip}
         pieData={pieData}
         setTTPos={setTTPos}
+        allSetTTPos={allSetTTPos}
         userInput={userInput}
         metadata={metadata}
       />
@@ -137,9 +134,9 @@ const Slice = ({
   ringPosition,
   hoveredTool,
   setHoveredTool,
-  setShowTooltip,
   pieData,
   setTTPos,
+  allSetTTPos,
   userInput,
   metadata,
   //   setHoveredData,
@@ -194,8 +191,6 @@ const Slice = ({
     return arcGenerator.centroid(hoveredData);
   };
 
-  // STALE STATE - old value of state remains before this UE goes into effect, giving
-  // effect of TT jumping from previous hovered position to new one
   useEffect(() => {
     if (sliceData.data.tool !== hoveredTool) return;
     setTTPos(calculateTooltipPos(pieData));
@@ -203,14 +198,13 @@ const Slice = ({
 
   const handleMouseOver = () => {
     setHoveredTool(sliceData.data.tool);
-    // setShowTooltip(true);
-    // setHoveredData(sliceData);
   };
   const handleMouseOut = () => {
     setHoveredTool(null);
-    setShowTooltip(false);
-    // NOT SURE IF NEEDED - STILL GETTING JUMPING EFFECT FROM OLD POSITION
-    setTTPos([0, 0]);
+    // Prevent 'jumping' effect
+    for (const setTTPos of allSetTTPos) {
+      setTTPos(null);
+    }
   };
 
   return (

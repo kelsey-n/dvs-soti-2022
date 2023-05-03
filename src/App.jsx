@@ -13,7 +13,7 @@ const sortOptions = {
   percGrowthUsers: 'growth (% respondents)',
 };
 const ringPositionOptions = {
-  totalUsage: 'total usage per year',
+  totalUsage: 'sample size', // 'total usage per year',
   // totalRespondents: 'total respondents per year',
   year: 'years',
 };
