@@ -4,6 +4,8 @@
   /* padding: 2rem; */
   text-align: center;
   overflow-x: clip;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
 }
 
 .logo {
@@ -100,10 +102,20 @@
   width: fit-content;
 }
 
+.year-label {
+  fill: #ffffff;
+  text-anchor: middle;
+  font-size: 14px;
+  pointer-events: none;
+}
+
 @media screen and (max-width: 768px) {
   .intro-text {
     top: 5%;
     left: 5%;
     right: 5%;
+  }
+  .year-label {
+    font-size: 12px;
   }
 }

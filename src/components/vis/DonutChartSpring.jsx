@@ -81,8 +81,6 @@ function DonutChartSpring({
     config: {
       // duration: 1200,
     },
-    fill: 'white',
-    textAnchor: 'middle',
     y: -innerRadiusScale(
       ringPosition === 'year'
         ? year
@@ -117,7 +115,12 @@ function DonutChartSpring({
     <svg ref={ref} width={width} height={height}>
       <g transform={`translate(${width / 2}, ${height / 2})`}>
         {allSlices}
-        <animated.text style={{ ...textTransitionProps }}>{year}</animated.text>
+        <animated.text
+          className="year-label"
+          style={{ ...textTransitionProps }}
+        >
+          {year === 2021 || year === 2022 ? year : `'${year % 100}`}
+        </animated.text>
       </g>
     </svg>
   );
