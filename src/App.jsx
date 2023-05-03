@@ -23,11 +23,11 @@ const ringWidthOptions = {
   meanPerYear: 'all respondents of this year',
 };
 
-// MOVE????
-let rootDiv = document.querySelector('#root');
-rootDiv.style.height = `${window.innerHeight * 2}px`; // CALCULATE THIS PROPERLY??? BASED ON RESPONSIVENESS OF SVG TOO
-
 function App() {
+  // Set root height to double page height to allow for scroll effect
+  let rootDiv = document.querySelector('#root');
+  rootDiv.style.height = `${window.innerHeight * 2}px`;
+
   const [sort, setSort] = useState('toolUsage');
   const [ringWidth, setRingWidth] = useState('meanPerTool');
   const [ringPosition, setRingPosition] = useState('totalUsage');
@@ -40,15 +40,12 @@ function App() {
 
   const controlsWidth = mobile ? 0 : min([450, window.innerWidth / 3]);
   const controlsElem = document.querySelector('.controls-wrapper-parent');
-  const controlsHeight = mobile ? 244 : 0;
+  const controlsHeight = mobile ? (window.innerWidth < 415 ? 283 : 244) : 0; // not best way to do this
 
   const [dimensions, setDimensions] = useState({
     width: window.innerWidth - controlsWidth,
     height: window.innerHeight - controlsHeight,
   });
-  const [svgSize, setSvgSize] = useState(
-    Math.min(dimensions.width, dimensions.height)
-  );
 
   useEffect(() => {
     window.addEventListener('resize', () => {
@@ -56,28 +53,16 @@ function App() {
     });
   }, []);
 
-  useEffect(() => {
-    if (!mobile || !controlsElem) return;
-    // const controls = document.querySelector('.controls-wrapper-parent');
-    console.log(controlsElem.offsetHeight);
-  }, [controlsElem, mobile]);
-
-  // Measure the size of the browser relative to controls width
+  // Measure the size of the browser relative to controls width & height
   useEffect(() => {
     window.addEventListener('resize', () => {
-      // Add in here check for if width > height: set width/height minus controls width (or height??? maybe doesn't matter )
-      // setControlsWidth(mobile ? 0 : min([450, window.innerWidth / 3]));
       setDimensions({
         width:
           window.innerWidth - (mobile ? 0 : min([450, window.innerWidth / 3])),
-        height: window.innerHeight - (mobile ? 244 : 0),
+        height:
+          window.innerHeight -
+          (mobile ? (window.innerWidth < 415 ? 283 : 244) : 0),
       });
-      setSvgSize(
-        Math.min(
-          window.innerWidth - (mobile ? 0 : min([450, window.innerWidth / 3])),
-          window.innerHeight - (mobile ? 244 : 0)
-        )
-      );
     });
   }, [mobile]);
 
@@ -112,14 +97,25 @@ function App() {
         style={{
           // formula to map original_value from [0, 1] to [min, max]:
           // mapped_value = (max - min) * original_value + min
-          //filter: scrollYProgress.to((val) => `blur(${10 - val * 10}px)`),
-          transform: scrollYProgress.to(
-            (val) =>
-              `translate(${
-                0 //window.innerWidth / 2 //(-window.innerWidth / 2) * val + window.innerWidth / 2
-              }px, ${
-                0 //(window.innerHeight + svgSize / 2) * val - svgSize / 2
-              }px)` // rotate(${-90 * val + 90}deg)`
+          filter: scrollYProgress.to((val) => `blur(${10 - val * 10}px)`),
+          transform: scrollYProgress.to((val) =>
+            !mobile
+              ? `translate(${
+                  (-dimensions.width / 2) * val + dimensions.width / 2
+                }px, ${
+                  (window.innerHeight + dimensions.height / 2) * val -
+                  dimensions.height / 2
+                }px) rotate(${-90 * val + 90}deg)`
+              : `translate(${
+                  (-dimensions.width / 2) * val + dimensions.width / 2
+                }px, ${
+                  (window.innerHeight +
+                    controlsHeight +
+                    dimensions.height / 3) *
+                    val -
+                  controlsHeight -
+                  dimensions.height / 3
+                }px) rotate(${-90 * val + 90}deg)`
           ),
           pointerEvents: scrollYProgress.to((val) =>
             val < 0.98 ? 'none' : ''
@@ -127,8 +123,7 @@ function App() {
         }}
       >
         <div className="controls-wrapper-parent">
-          {/* <animated.div style={controlStyles}> */}
-          <animated.div>
+          <animated.div style={controlStyles}>
             <Controls
               sort={sort}
               setSort={setSort}
@@ -152,7 +147,6 @@ function App() {
           userInput={userInput}
           width={dimensions.width}
           height={dimensions.height}
-          svgSize={svgSize}
         />
       </animated.div>
     </>

@@ -20,7 +20,6 @@ function Viz({
   userInput,
   width,
   height,
-  svgSize,
 }) {
   const ref = useRef();
 
@@ -147,7 +146,6 @@ function Viz({
             key={year}
             width={width}
             height={height}
-            svgSize={svgSize}
             data={dataFiltered}
             metadata={metadata}
             year={year}
