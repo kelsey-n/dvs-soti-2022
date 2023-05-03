@@ -15,25 +15,39 @@ function Controls({
   setUserInput,
 }) {
   return (
-    <div>
+    <div className="controls-wrapper">
       {/* Sort arcs within each ring  */}
-      <form>
-        <label htmlFor="sort-select">Sort each ring by </label>
-        <select
-          id="sort-select"
-          value={sort}
-          onChange={(event) => {
-            setSort(event.target.value);
-            setUserInput('sort');
-          }}
-        >
-          {Object.entries(sortOptions).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
-      </form>
+      <div className="button-group">
+        <p>Find patterns within & across years!</p>
+        {Object.entries(sortOptions).map(([value, label]) => (
+          <button
+            key={value}
+            value={value}
+            onClick={(event) => {
+              setSort(event.target.value);
+              setUserInput('sort');
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      {/* Change ring position */}
+      <div className="button-group">
+        <p>Order rings by:</p>
+        {Object.entries(ringPositionOptions).map(([value, label]) => (
+          <button
+            key={value}
+            value={value}
+            onClick={(event) => {
+              setRingPosition(event.target.value);
+              setUserInput('ringPosition');
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
       {/* Change ring width */}
       {/* <form>
         <label htmlFor="ring-width-select">
@@ -54,24 +68,6 @@ function Controls({
           ))}
         </select>
       </form> */}
-      {/* Change ring position */}
-      <form>
-        <label htmlFor="ring-position-select">Position rings by</label>
-        <select
-          id="ring-position-select"
-          value={ringPosition}
-          onChange={(event) => {
-            setRingPosition(event.target.value);
-            setUserInput('ringPosition');
-          }}
-        >
-          {Object.entries(ringPositionOptions).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
-      </form>
       {/* Change top number of tools shown */}
       {/* <form>
         <label htmlFor="num-tools-select">Show top x tools</label>

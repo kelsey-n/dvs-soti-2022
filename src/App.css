@@ -50,8 +50,18 @@
   gap: 20px;
 }
 
+.mobile {
+  flex-direction: column;
+  align-items: center;
+}
+
+.controls-wrapper-parent {
+  max-width: 450px;
+}
+
 .intro-text {
   position: absolute;
+  /* padding: 10%; */
   bottom: 50%;
   left: 20%;
   right: 20%;
@@ -68,4 +78,24 @@
   /* background-color: lightsteelblue; */
   text-align: left;
   pointer-events: none;
+}
+
+.controls-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-top: 40px;
+  margin-left: 10px;
+}
+
+.button-group {
+  border: 1px solid #ffffff;
+  border-radius: 3px;
+  padding-bottom: 8px;
+}
+
+.button-group p {
+  margin: -14px 8px 8px;
+  background-color: #242424;
+  width: fit-content;
 }

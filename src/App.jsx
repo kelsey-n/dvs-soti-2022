@@ -4,6 +4,7 @@ import Viz from './components/vis/Viz';
 import Controls from './components/controls/Controls';
 import './App.css';
 import { introText } from './constants';
+import { min } from 'd3';
 
 const sortOptions = {
   toolName: 'tool name',
@@ -11,18 +12,16 @@ const sortOptions = {
   absGrowth: 'growth (# users)',
   percGrowthUsers: 'growth (% respondents)',
 };
-// NOT USING
-const ringWidthOptions = {
-  meanPerTool: 'users of this tool',
-  meanPerYear: 'all respondents of this year',
-};
 const ringPositionOptions = {
   totalUsage: 'total usage per year',
   // totalRespondents: 'total respondents per year',
   year: 'years',
 };
-
-const controlsWidth = 182;
+// NOT USING
+const ringWidthOptions = {
+  meanPerTool: 'users of this tool',
+  meanPerYear: 'all respondents of this year',
+};
 
 // MOVE????
 let rootDiv = document.querySelector('#root');
@@ -34,26 +33,53 @@ function App() {
   const [ringPosition, setRingPosition] = useState('totalUsage');
   const [topNumTools, setTopNumTools] = useState(40);
   const [userInput, setUserInput] = useState(null);
+
+  const [mobile, setMobile] = useState(
+    window.innerHeight > window.innerWidth ? true : false
+  );
+
+  const controlsWidth = mobile ? 0 : min([450, window.innerWidth / 3]);
+  const controlsElem = document.querySelector('.controls-wrapper-parent');
+  const controlsHeight = mobile ? 244 : 0;
+
   const [dimensions, setDimensions] = useState({
-    width: window.innerWidth - controlsWidth, // TOOOOOOOOOOOOO DOOOOOOOOOOOOOOOOOOOOOO: DYNAMICALLY GET WIDTH OF SIDE MENU (OR JUST PUT THE FINAL WIDTH IN HERE)
-    height: window.innerHeight,
+    width: window.innerWidth - controlsWidth,
+    height: window.innerHeight - controlsHeight,
   });
   const [svgSize, setSvgSize] = useState(
     Math.min(dimensions.width, dimensions.height)
   );
 
-  // Measure the size of the browser
   useEffect(() => {
     window.addEventListener('resize', () => {
-      setDimensions({
-        width: window.innerWidth - controlsWidth,
-        height: window.innerHeight,
-      });
-      setSvgSize(
-        Math.min(window.innerWidth - controlsWidth, window.innerHeight)
-      );
+      setMobile(window.innerHeight > window.innerWidth ? true : false);
     });
   }, []);
+
+  useEffect(() => {
+    if (!mobile || !controlsElem) return;
+    // const controls = document.querySelector('.controls-wrapper-parent');
+    console.log(controlsElem.offsetHeight);
+  }, [controlsElem, mobile]);
+
+  // Measure the size of the browser relative to controls width
+  useEffect(() => {
+    window.addEventListener('resize', () => {
+      // Add in here check for if width > height: set width/height minus controls width (or height??? maybe doesn't matter )
+      // setControlsWidth(mobile ? 0 : min([450, window.innerWidth / 3]));
+      setDimensions({
+        width:
+          window.innerWidth - (mobile ? 0 : min([450, window.innerWidth / 3])),
+        height: window.innerHeight - (mobile ? 244 : 0),
+      });
+      setSvgSize(
+        Math.min(
+          window.innerWidth - (mobile ? 0 : min([450, window.innerWidth / 3])),
+          window.innerHeight - (mobile ? 244 : 0)
+        )
+      );
+    });
+  }, [mobile]);
 
   // Transition Controls in when we scroll to the bottom of the page
   const [controlStyles, controlAPI] = useSpring(() => ({
@@ -82,26 +108,27 @@ function App() {
     <>
       <div className="intro-text">{introText}</div>
       <animated.div
-        className="app-wrapper"
+        className={`app-wrapper ${mobile ? 'mobile' : ''}`}
         style={{
           // formula to map original_value from [0, 1] to [min, max]:
           // mapped_value = (max - min) * original_value + min
-          filter: scrollYProgress.to((val) => `blur(${10 - val * 10}px)`),
+          //filter: scrollYProgress.to((val) => `blur(${10 - val * 10}px)`),
           transform: scrollYProgress.to(
             (val) =>
               `translate(${
-                (-window.innerWidth / 2) * val + window.innerWidth / 2
+                0 //window.innerWidth / 2 //(-window.innerWidth / 2) * val + window.innerWidth / 2
               }px, ${
-                (window.innerHeight + svgSize / 2) * val - svgSize / 2
-              }px) rotate(${-90 * val + 90}deg)`
+                0 //(window.innerHeight + svgSize / 2) * val - svgSize / 2
+              }px)` // rotate(${-90 * val + 90}deg)`
           ),
           pointerEvents: scrollYProgress.to((val) =>
             val < 0.98 ? 'none' : ''
           ),
         }}
       >
-        <div>
-          <animated.div style={controlStyles}>
+        <div className="controls-wrapper-parent">
+          {/* <animated.div style={controlStyles}> */}
+          <animated.div>
             <Controls
               sort={sort}
               setSort={setSort}
@@ -125,6 +152,7 @@ function App() {
           userInput={userInput}
           width={dimensions.width}
           height={dimensions.height}
+          svgSize={svgSize}
         />
       </animated.div>
     </>
