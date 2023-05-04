@@ -33,6 +33,10 @@ function DonutChartSpring({
   ringPosition,
   hoveredTool,
   setHoveredTool,
+  setHoveredToolColor,
+  setClickedToolColor,
+  clickedTool,
+  setClickedTool,
   setTTPos,
   allSetTTPos,
   userInput,
@@ -99,6 +103,10 @@ function DonutChartSpring({
         ringPosition={ringPosition}
         hoveredTool={hoveredTool}
         setHoveredTool={setHoveredTool}
+        setHoveredToolColor={setHoveredToolColor}
+        clickedTool={clickedTool}
+        setClickedTool={setClickedTool}
+        setClickedToolColor={setClickedToolColor}
         pieData={pieData}
         setTTPos={setTTPos}
         allSetTTPos={allSetTTPos}
@@ -134,6 +142,10 @@ const Slice = ({
   ringPosition,
   hoveredTool,
   setHoveredTool,
+  setHoveredToolColor,
+  clickedTool,
+  setClickedTool,
+  setClickedToolColor,
   pieData,
   setTTPos,
   allSetTTPos,
@@ -197,7 +209,9 @@ const Slice = ({
   }, [hoveredTool]);
 
   const handleMouseOver = () => {
+    if (clickedTool !== null) return;
     setHoveredTool(sliceData.data.tool);
+    setHoveredToolColor(color);
   };
   const handleMouseOut = () => {
     setHoveredTool(null);
@@ -205,6 +219,10 @@ const Slice = ({
     for (const setTTPos of allSetTTPos) {
       setTTPos(null);
     }
+  };
+  const handleClick = () => {
+    setClickedTool(sliceData.data.tool);
+    setClickedToolColor(color);
   };
 
   return (
@@ -222,9 +240,10 @@ const Slice = ({
       fill={color}
       style={{
         opacity:
-          hoveredTool === null
+          hoveredTool === null && clickedTool === null
             ? 0.7
-            : sliceData.data.tool === hoveredTool
+            : sliceData.data.tool === hoveredTool ||
+              sliceData.data.tool === clickedTool
             ? 1
             : 0.3,
         stroke: 'black',
@@ -232,6 +251,7 @@ const Slice = ({
       }}
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
+      onClick={handleClick}
     />
   );
 };

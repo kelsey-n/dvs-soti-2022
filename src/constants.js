@@ -1,5 +1,6 @@
-export const dataFilters = {
-  minTotalUsers: 250,
+export const fontColors = {
+  lightFontColor: 'rgba(255, 255, 255, 0.87)',
+  darkFontColor: '#242424',
 };
 
 // TRY making corner radius dependent on users...? maybe not though

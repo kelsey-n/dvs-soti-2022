@@ -1,12 +1,22 @@
 import { useState, useEffect, useRef, memo } from 'react';
-import { max, select, scaleBand, scaleLinear, min, extent } from 'd3';
+import {
+  max,
+  select,
+  scaleBand,
+  scaleLinear,
+  min,
+  extent,
+  hcl,
+  format,
+} from 'd3';
 import DonutChartSpring from './DonutChartSpring';
-import data from '../../assets/mergedOutputAllYears_edited_5_3_index.csv';
+import data from '../../assets/mergedOutputAllYears_edited_5_4_recalcGrowth.csv';
 import metadata from '../../assets/metadata_5_2_index.csv';
+import { fontColors } from '../../constants';
 
-const margin = { top: 40, bottom: 40, left: 40, right: 40 };
+const margin = { top: 40, bottom: 0, left: 40, right: 40 };
 // const margin = { top: 0, bottom: 0, left: 0, right: 0 };
-const outerRingMargin = 50;
+const outerRingMargin = 40;
 
 const years = [2022, 2021, 2020, 2019, 2018, 2017];
 
@@ -20,6 +30,8 @@ function Viz({
   userInput,
   width,
   height,
+  clickedTool,
+  setClickedTool,
 }) {
   const ref = useRef();
   const svgRadius =
@@ -30,6 +42,8 @@ function Viz({
   const minTotalUsers = window.innerWidth < 1024 ? 250 : 30;
 
   const [hoveredTool, setHoveredTool] = useState(null);
+  const [hoveredToolColor, setHoveredToolColor] = useState(null);
+  const [clickedToolColor, setClickedToolColor] = useState(null);
 
   // Individual states to send to each donut to set tooltip positions
   const [TTPos2022, setTTPos2022] = useState(null);
@@ -129,11 +143,26 @@ function Viz({
   //     one(svg, 'g', 'bar-listing-parent');
   //   });
 
-  const hoveredData = dataFiltered.filter((d) => d.tool === hoveredTool)[0];
+  let hoveredData;
+  if (hoveredTool) {
+    hoveredData = dataFiltered.filter((d) => d.tool === hoveredTool)[0];
+  } else if (clickedTool) {
+    hoveredData = dataFiltered.filter((d) => d.tool === clickedTool)[0];
+  }
+
+  // Clear clicked tool on click of svg container, not elements
+  const handleContainerClick = (event) => {
+    if (event.target === ref.current) setClickedTool(null);
+  };
 
   return (
     <div className="viz-svg-container">
-      <svg ref={ref} width={width} height={height}>
+      <svg
+        ref={ref}
+        width={width}
+        height={height}
+        onClick={handleContainerClick}
+      >
         {years.map((year) => (
           <DonutChartSpring
             key={year}
@@ -149,6 +178,10 @@ function Viz({
             ringPosition={ringPosition}
             hoveredTool={hoveredTool}
             setHoveredTool={setHoveredTool}
+            setHoveredToolColor={setHoveredToolColor}
+            setClickedToolColor={setClickedToolColor}
+            clickedTool={clickedTool}
+            setClickedTool={setClickedTool}
             setTTPos={eval(`setTTPos${year}`)} // Only send the relevant year's tooltip position setter to update in that donut
             // Array of all tt position setters to set all to null on mouseOut - prevents tooltip jumping before all states updated
             allSetTTPos={[
@@ -164,7 +197,49 @@ function Viz({
         ))}
       </svg>
       {/* Extra tooltip here for hovered tool name  */}
-      {hoveredTool && <div className="tooltip">{hoveredTool}</div>}
+      {(hoveredTool || clickedTool) && (
+        <>
+          <div
+            className="tooltip tool-name"
+            style={{
+              backgroundColor: clickedTool
+                ? clickedToolColor
+                : hoveredToolColor,
+              color: clickedTool
+                ? hcl(clickedToolColor).l > 63
+                  ? fontColors.darkFontColor
+                  : fontColors.lightFontColor
+                : hcl(hoveredToolColor).l > 63
+                ? fontColors.darkFontColor
+                : fontColors.lightFontColor,
+            }}
+          >
+            {hoveredData.tool}
+          </div>
+          <div
+            className="tooltip tool-info"
+            style={
+              {
+                // backgroundColor: hoveredToolColor,
+                // color:
+                //   hcl(hoveredToolColor).l > 63
+                //     ? fontColors.darkFontColor
+                //     : fontColors.lightFontColor,
+              }
+            }
+          >
+            {sort === 'toolName' || sort === 'toolUsage'
+              ? `${format(',')(hoveredData.total_users)} users`
+              : sort === 'absGrowth'
+              ? `${format('+,')(
+                  hoveredData.absolutegrowth
+                )} users from '17 to '22`
+              : `used by ${format('+.0%')(
+                  hoveredData.percgrowth_responders
+                )} of respondents from '17 to '22`}
+          </div>
+        </>
+      )}
       {/* Show tooltip for each donut */}
       {hoveredTool &&
         years.map((year) =>
@@ -179,7 +254,8 @@ function Viz({
                 }px, ${eval(`TTPos${year}`)[1] + height / 2}px)`,
               }}
             >
-              {hoveredData[`${year}_users`]} users
+              {hoveredData[`${year}_users`] +
+                (hoveredData[`${year}_users`] === 1 ? ' user' : ' users')}
             </div>
           ) : null
         )}

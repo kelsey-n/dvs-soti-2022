@@ -82,6 +82,20 @@
   pointer-events: none;
 }
 
+.tool-name {
+  top: 15px;
+  left: 7px;
+  padding: 1px 5px;
+  border-radius: 1px;
+}
+
+.tool-info {
+  top: 45px;
+  left: 7px;
+  font-size: 14px;
+  width: 200px;
+}
+
 .controls-wrapper {
   display: flex;
   flex-direction: column;
@@ -105,8 +119,11 @@
 .year-label {
   fill: #ffffff;
   text-anchor: middle;
-  font-size: 14px;
+  font-size: 20px;
   pointer-events: none;
+  stroke: #242424;
+  paint-order: stroke;
+  stroke-width: 3px;
 }
 
 @media screen and (max-width: 768px) {

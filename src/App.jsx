@@ -24,6 +24,8 @@ const ringWidthOptions = {
 };
 
 function App() {
+  const controlsRef = useRef();
+
   // Set root height to double page height to allow for scroll effect
   let rootDiv = document.querySelector('#root');
   rootDiv.style.height = `${window.innerHeight * 2}px`;
@@ -33,6 +35,7 @@ function App() {
   const [ringPosition, setRingPosition] = useState('year');
   const [topNumTools, setTopNumTools] = useState(40);
   const [userInput, setUserInput] = useState(null);
+  const [clickedTool, setClickedTool] = useState(null);
 
   const [mobile, setMobile] = useState(
     window.innerHeight > window.innerWidth ? true : false
@@ -88,6 +91,11 @@ function App() {
     },
   });
 
+  // Clear clicked tool on click of controls container
+  const resetClickedTool = (event) => {
+    if (event.target === controlsRef.current) setClickedTool(null);
+  };
+
   return (
     <>
       <div className="intro-text">{introText}</div>
@@ -121,7 +129,11 @@ function App() {
           ),
         }}
       >
-        <div className="controls-wrapper-parent">
+        <div
+          ref={controlsRef}
+          className="controls-wrapper-parent"
+          onClick={resetClickedTool}
+        >
           <animated.div style={controlStyles}>
             <Controls
               sort={sort}
@@ -136,6 +148,7 @@ function App() {
               topNumTools={topNumTools}
               setTopNumTools={setTopNumTools}
               setUserInput={setUserInput}
+              setClickedTool={setClickedTool}
             />
           </animated.div>
         </div>
@@ -146,6 +159,8 @@ function App() {
           userInput={userInput}
           width={dimensions.width}
           height={dimensions.height}
+          clickedTool={clickedTool}
+          setClickedTool={setClickedTool}
         />
       </animated.div>
     </>
