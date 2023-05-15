@@ -17,6 +17,7 @@ import {
   selectAll,
   local,
 } from 'd3';
+import { colorScheme } from '../../constants';
 
 const margin = { top: 20, bottom: 20, left: 20, right: 20 };
 
@@ -76,7 +77,7 @@ function DonutChartSpring({
   // TEMPORARY color scale
   const color = scaleOrdinal()
     .domain(data.map((d) => d.tool))
-    .range(schemeSet3);
+    .range(colorScheme);
 
   const textTransitionProps = useSpring({
     config: {

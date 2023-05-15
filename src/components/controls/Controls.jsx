@@ -19,34 +19,44 @@ function Controls({
       {/* Sort arcs within each ring  */}
       <div className="button-group">
         <p>Find patterns within & across years!</p>
-        {Object.entries(sortOptions).map(([value, label]) => (
-          <button
-            key={value}
-            value={value}
-            onClick={(event) => {
-              setSort(event.target.value);
-              setUserInput('sort');
-            }}
-          >
-            {label}
-          </button>
-        ))}
+        <div>
+          {Object.entries(sortOptions).map(([value, label]) => (
+            <button
+              key={value}
+              value={value}
+              onClick={(event) => {
+                setSort(event.target.value);
+                setUserInput('sort');
+              }}
+              className={sort === value ? 'active' : null}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
       {/* Change ring position */}
       <div className="button-group">
         <p>Order rings by:</p>
-        {Object.entries(ringPositionOptions).map(([value, label]) => (
-          <button
-            key={value}
-            value={value}
-            onClick={(event) => {
-              setRingPosition(event.target.value);
-              setUserInput('ringPosition');
-            }}
-          >
-            {label}
-          </button>
-        ))}
+        <div>
+          {Object.entries(ringPositionOptions).map(([value, label]) => (
+            <button
+              key={value}
+              value={value}
+              onClick={(event) => {
+                setRingPosition(event.target.value);
+                setUserInput('ringPosition');
+              }}
+              className={ringPosition === value ? 'active' : ''}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="tip-text">
+        Tip: Click any arc to focus on a single tool across views! Click
+        background to clear.
       </div>
       {/* Change ring width */}
       {/* <form>

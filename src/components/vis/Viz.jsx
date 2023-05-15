@@ -10,7 +10,7 @@ import {
   format,
 } from 'd3';
 import DonutChartSpring from './DonutChartSpring';
-import data from '../../assets/mergedOutputAllYears_edited_5_4_recalcGrowth.csv';
+import data from '../../assets/mergedOutputAllYears_edited_5_14.csv';
 import metadata from '../../assets/metadata_5_2_index.csv';
 import { fontColors } from '../../constants';
 
@@ -126,7 +126,7 @@ function Viz({
       differences.push(difference);
     }
     // Set the default radius to slightly below this min distance (since we have 2 rings that are very close together)
-    outerRadiusDefault = Math.floor(min(differences));
+    outerRadiusDefault = Math.floor(min(differences)) + 5;
   }
 
   // Only set the outer radius scale (to be proportional to total tool usage) when we position rings by year
@@ -247,15 +247,20 @@ function Viz({
           eval(`TTPos${year}`) !== null ? (
             <div
               key={year}
-              className="tooltip"
+              className="tooltip tooltip-ring"
               style={{
                 transform: `translate(${
                   eval(`TTPos${year}`)[0] + width / 2
                 }px, ${eval(`TTPos${year}`)[1] + height / 2}px)`,
               }}
             >
-              {hoveredData[`${year}_users`] +
-                (hoveredData[`${year}_users`] === 1 ? ' user' : ' users')}
+              {sort === 'percGrowthUsers'
+                ? format('.0%')(
+                    hoveredData[`${year}_users`] /
+                      metadata.filter((d) => d.year === year)[0].respondents
+                  )
+                : hoveredData[`${year}_users`] +
+                  (hoveredData[`${year}_users`] === 1 ? ' user' : ' users')}
             </div>
           ) : null
         )}

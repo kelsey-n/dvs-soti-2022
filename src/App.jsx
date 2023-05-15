@@ -3,7 +3,7 @@ import { useScroll, animated, useSpring } from 'react-spring';
 import Viz from './components/vis/Viz';
 import Controls from './components/controls/Controls';
 import './App.css';
-import { introText } from './constants';
+import { howToRead, howToReadText, introText } from './constants';
 import { min } from 'd3';
 
 const sortOptions = {
@@ -42,7 +42,11 @@ function App() {
   );
 
   const controlsWidth = mobile ? 0 : min([450, window.innerWidth / 3]);
-  const controlsHeight = mobile ? (window.innerWidth < 415 ? 283 : 244) : 0; // not best way to do this
+  const controlsHeight = mobile
+    ? window.innerWidth < 415
+      ? 283 + 70
+      : 244 + 70
+    : 0; // not best way to do this
 
   const [dimensions, setDimensions] = useState({
     width: window.innerWidth - controlsWidth,
@@ -63,7 +67,7 @@ function App() {
           window.innerWidth - (mobile ? 0 : min([450, window.innerWidth / 3])),
         height:
           window.innerHeight -
-          (mobile ? (window.innerWidth < 415 ? 283 : 244) : 0),
+          (mobile ? (window.innerWidth < 415 ? 283 + 70 : 244 + 70) : 0),
       });
     });
   }, [mobile]);
@@ -71,6 +75,10 @@ function App() {
   // Transition Controls in when we scroll to the bottom of the page
   const [controlStyles, controlAPI] = useSpring(() => ({
     opacity: 0,
+  }));
+  // Transition Intro text out in when we scroll to the bottom of the page
+  const [introTextStyles, introTextAPI] = useSpring(() => ({
+    opacity: 1,
   }));
 
   const { scrollYProgress } = useScroll({
@@ -82,8 +90,13 @@ function App() {
           delay: 200,
           config: { duration: 1200 },
         });
+        introTextAPI.start({
+          opacity: 0,
+          immediate: true,
+        });
       } else {
         controlAPI.start({ opacity: 0, immediate: true });
+        introTextAPI.start({ opacity: 1, immediate: true });
       }
     },
     default: {
@@ -98,7 +111,56 @@ function App() {
 
   return (
     <>
-      <div className="intro-text">{introText}</div>
+      <animated.div className="intro-wrapper" style={introTextStyles}>
+        <div className="title">Evolution of Data Viz Tools (2017 - 2022)</div>
+        <div className="intro-text">
+          From 2017 to 2022, the Data Visualization Society has conducted an
+          annual{' '}
+          <a
+            href="https://www.datavisualizationsociety.org/survey"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            State of the Industry survey
+          </a>
+          . Its purpose is to record & understand the changing status of this
+          blossoming field by asking practitioners various questions related to
+          their work. The visualization below focuses specifically on the tools
+          that respondents use for Data Visualization, and allows users to
+          explore the data with several views. For clarity, the tools shown are
+          only those with 30+ total users (250+ on mobile).
+          <br></br>
+          <br></br>
+          <br></br>
+          <b>BASICS TO UNDERSTAND THIS VISUALIZATION</b>
+          <br></br>
+          Each ring represents a single year's data on the tools/technologies
+          survey respondents use to visualize data.
+          <br></br>
+          <br></br>
+          The angle of each colored arc represents the proportional usage of a
+          specific tool (# of tool users / total users). Note, it is the angle
+          and not the arc length that represents this value.
+          <br></br>
+          <br></br>
+          There are two methods of sorting. The first sorts tools within years,
+          with options to sort by tool name, tool usage, and tool growth
+          (measured either by # of users or % of respondents). These views allow
+          you to explore what tools are used each year and how their usage
+          trends over time.
+          <br></br>
+          <br></br>
+          The second method sorts rings by year or by sample size (i.e. sample
+          size did not always increase every year). When sorting by sample size,
+          the circumference of each ring is proportional to the sample size of
+          that year. However, when sorting by year, the circumference represents
+          the year, so the width of each ring becomes proportional to its sample
+          size.
+          <br></br>
+          <br></br>
+          <em>Happy exploring!</em>
+        </div>
+      </animated.div>
       <animated.div
         className={`app-wrapper ${mobile ? 'mobile' : ''}`}
         style={{
