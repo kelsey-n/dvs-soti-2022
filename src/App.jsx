@@ -112,7 +112,10 @@ function App() {
   return (
     <>
       <animated.div className="intro-wrapper" style={introTextStyles}>
-        <div className="title">Evolution of Data Viz Tools (2017 - 2022)</div>
+        <div className="title">
+          Evolution of Data Viz Tools{' '}
+          <span style={{ fontSize: '16px' }}>(2017 - 2022)</span>
+        </div>
         <div className="intro-text">
           From 2017 to 2022, the Data Visualization Society has conducted an
           annual{' '}
