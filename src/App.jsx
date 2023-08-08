@@ -1,10 +1,17 @@
 import { useEffect, useState, useRef } from 'react';
-import { useScroll, animated, useSpring } from 'react-spring';
+import { useScroll, animated, useSpring, useSprings } from 'react-spring';
 import Viz from './components/vis/Viz';
 import Controls from './components/controls/Controls';
 import './App.css';
-import { howToRead, howToReadText, introText } from './constants';
-import { min } from 'd3';
+import {
+  howToRead,
+  howToReadText,
+  introText,
+  randomIntFromInterval,
+} from './constants';
+import { min, range } from 'd3';
+
+console.log('new push');
 
 const sortOptions = {
   toolName: 'tool name',
@@ -109,8 +116,39 @@ function App() {
     if (event.target === controlsRef.current) setClickedTool(null);
   };
 
+  // Animated rings
+  const animatedRingProps = useSpring({
+    config: {
+      duration: 5000,
+    },
+    from: { y: window.innerHeight - 30 },
+    to: { y: -30 },
+    // loop: true,
+  });
+
   return (
     <>
+      {/* {range(0, 5).map((d) => {
+        const widthHeight = randomIntFromInterval(25, 200);
+        return (
+          <animated.span
+            key={d}
+            className="animated-ring"
+            style={{
+              borderRadius: '50%',
+              position: 'absolute',
+              width: `${widthHeight}px`,
+              height: `${widthHeight}px`,
+              border: '2px solid white',
+              x: `${randomIntFromInterval(
+                -window.innerWidth / 2,
+                window.innerWidth / 2
+              )}px`,
+              ...animatedRingProps,
+            }}
+          ></animated.span>
+        );
+      })} */}
       <animated.div className="intro-wrapper" style={introTextStyles}>
         <div className="title">
           Evolution of Data Viz Tools{' '}
