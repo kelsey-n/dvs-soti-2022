@@ -58,6 +58,9 @@ function Controls({
         Tip: Click any arc to focus on a single tool across views! Click
         background to clear.
       </div>
+      <button onClick={() => MicroModal.show('modal-1')}>
+        How to read this viz
+      </button>
       {/* Change ring width */}
       {/* <form>
         <label htmlFor="ring-width-select">

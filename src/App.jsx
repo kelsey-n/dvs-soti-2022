@@ -3,15 +3,9 @@ import { useScroll, animated, useSpring, useSprings } from 'react-spring';
 import Viz from './components/vis/Viz';
 import Controls from './components/controls/Controls';
 import './App.css';
-import {
-  howToRead,
-  howToReadText,
-  introText,
-  randomIntFromInterval,
-} from './constants';
-import { min, range } from 'd3';
-
-console.log('new push');
+import './modal.css';
+import { min } from 'd3';
+import MicroModal from 'micromodal';
 
 const sortOptions = {
   toolName: 'tool name',
@@ -31,6 +25,7 @@ const ringWidthOptions = {
 };
 
 function App() {
+  MicroModal.init({ disableScroll: true });
   const controlsRef = useRef();
 
   // Set root height to double page height to allow for scroll effect
@@ -51,8 +46,8 @@ function App() {
   const controlsWidth = mobile ? 0 : min([450, window.innerWidth / 3]);
   const controlsHeight = mobile
     ? window.innerWidth < 415
-      ? 283 + 70
-      : 244 + 70
+      ? 283 + 70 + 80
+      : 244 + 70 + 70
     : 0; // not best way to do this
 
   const [dimensions, setDimensions] = useState({
@@ -151,10 +146,62 @@ function App() {
       })} */}
       <animated.div className="intro-wrapper" style={introTextStyles}>
         <div className="title">
-          Evolution of Data Viz Tools{' '}
-          <span style={{ fontSize: '16px' }}>(2017 - 2022)</span>
+          The rise and fall of data viz tools
+          {/* <span style={{ fontSize: '16px' }}>(2017 - 2022)</span> */}
         </div>
         <div className="intro-text">
+          <div className="left-align">
+            This visualization (about the tools used <em>for</em> data
+            visualization) shows the evolution of one part of this blossoming
+            industry. Growth in the field as a whole can be seen by the increase
+            in respondents to the DVS industry survey, as well as the by the
+            diversity of tools used. In 2017, most tools used were coding-heavy
+            tools, like D3, ggplot, Python or R. But by 2022, we see a diverse
+            field of tools including: tools not traditionally used for data viz
+            (e.g. Powerpoint); design tools (like Figma and Illustrator); and
+            online data viz platforms (e.g. RAWGraphs and Flourish).
+          </div>
+          <br></br>
+          <em>Let's meet some of the notable players in this field:</em>
+          <br></br>
+          <br></br>
+          {/* </div> */}
+          <div className="">
+            <div className="grid-container">
+              <div className="grid-child">
+                <div className="grid-child-heading" id="rising-stars">
+                  All-stars
+                </div>
+                Large growth, 1000+ users<br></br>
+                <em>Powerpoint, Pen and paper, Power BI</em>
+              </div>
+              <div className="grid-child">
+                <div className="grid-child-heading" id="emerging-talent">
+                  Emerging talent
+                </div>
+                Large growth, less than 450 users<br></br>
+                <em>Google Sheets, Figma, RAWGraphs</em>
+              </div>
+              <div className="grid-child">
+                <div className="grid-child-heading" id="veterans">
+                  Veterans
+                </div>
+                Small growth/shrinkage, 2000+ users<br></br>
+                <em>Excel, Tableau, R</em>
+              </div>
+              <div className="grid-child">
+                <div className="grid-child-heading" id="slump-phase">
+                  Slump phase
+                </div>
+                Large shrinkage, 2000+ users<br></br>
+                <em>D3, ggplot/ggplot2, Python/Pandas</em>
+              </div>
+            </div>
+          </div>
+          <br></br>
+          See for yourself - <em>happy exploring!</em>
+        </div>
+        {/* <div className="intro-text">
           From 2017 to 2022, the Data Visualization Society has conducted an
           annual{' '}
           <a
@@ -200,7 +247,7 @@ function App() {
           <br></br>
           <br></br>
           <em>Happy exploring!</em>
-        </div>
+        </div> */}
       </animated.div>
       <animated.div
         className={`app-wrapper ${mobile ? 'mobile' : ''}`}
@@ -266,6 +313,85 @@ function App() {
           setClickedTool={setClickedTool}
         />
       </animated.div>
+      <div class="modal micromodal-slide" id="modal-1" aria-hidden="true">
+        <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+          <div
+            class="modal__container"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-1-title"
+          >
+            <header class="modal__header">
+              <h2 class="modal__title" id="modal-1-title">
+                How to read this viz
+              </h2>
+              <button
+                class="modal__close"
+                aria-label="Close modal"
+                data-micromodal-close
+              ></button>
+            </header>
+            <main class="modal__content left-align" id="modal-1-content">
+              {/* From 2017 to 2022, the Data Visualization Society has conducted an
+              annual{' '}
+              <a
+                href="https://www.datavisualizationsociety.org/survey"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                State of the Industry survey
+              </a>
+              . Its purpose is to record & understand the changing status of
+              this blossoming field by asking practitioners various questions
+              related to their work. The visualization below focuses
+              specifically on the tools that respondents use for Data
+              Visualization, and allows users to explore the data with several
+              views. For clarity, the tools shown are only those with 30+ total
+              users (250+ on mobile).
+              <br></br>
+              <br></br>
+              <br></br>
+              <b>BASICS TO UNDERSTAND THIS VISUALIZATION</b> */}
+              Each ring represents a single year's data on the
+              tools/technologies survey respondents use to visualize data.
+              <br></br>
+              <br></br>
+              The angle of each colored arc represents the proportional usage of
+              a specific tool (# of tool users / total users). Note, it is the
+              angle and not the arc length that represents this value.
+              <br></br>
+              <br></br>
+              There are two methods of sorting. The first sorts tools within
+              years, with options to sort by tool name, tool usage, and tool
+              growth (measured either by # of users or % of respondents). These
+              views allow you to explore what tools are used each year and how
+              their usage trends over time.
+              <br></br>
+              <br></br>
+              The second method sorts rings by year or by sample size (i.e.
+              sample size did not always increase every year). When sorting by
+              sample size, the circumference of each ring is proportional to the
+              sample size of that year. However, when sorting by year, the
+              circumference represents the year, so the width of each ring
+              becomes proportional to its sample size.
+              <br></br>
+              <br></br>
+              <span style={{ 'font-size': '13px' }}>
+                Data was sourced from the Data Visualization Society's{' '}
+                <a
+                  href="https://www.datavisualizationsociety.org/survey"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  State of the Industry survey
+                </a>
+                . For clarity, the tools shown are only those with 30+ total
+                users (250+ on mobile).
+              </span>
+            </main>
+          </div>
+        </div>
+      </div>
     </>
   );
 }

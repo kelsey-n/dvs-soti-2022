@@ -74,7 +74,11 @@
 
 .intro-text {
   /* padding: 15% 10% 5%; */
-  padding: 10%;
+  padding: 5%;
+}
+
+.left-align {
+  text-align: left;
 }
 
 .viz-svg-container {
@@ -179,6 +183,44 @@
   stroke-width: 3px;
 }
 
+.grid-container {
+  display: grid;
+  grid-template-rows: 1fr 1fr; /* Two rows of equal size */
+  grid-template-columns: 1fr 1fr; /* Two columns of equal size */
+  gap: 20px; /* Adjust the gap between rows and columns as needed */
+}
+
+.grid-child {
+  background: #403939ff;
+  padding: 3%;
+  border-radius: 20px;
+  border: 1px solid #ffffff70;
+}
+
+.grid-child-heading {
+  padding: 3% 5%;
+  border-radius: 14px;
+  margin-bottom: 3%;
+  font-size: 20px;
+  text-align: left;
+}
+
+#rising-stars {
+  border: 2px solid #ffc107;
+}
+
+#emerging-talent {
+  border: 2px solid #9575cd;
+}
+
+#veterans {
+  border: 2px solid #4caf50;
+}
+
+#slump-phase {
+  border: 2px solid #ef5350;
+}
+
 @media screen and (max-width: 768px) {
   .year-label {
     font-size: 16px;
@@ -186,5 +228,15 @@
   .intro-text {
     padding: 2%;
     font-size: 13px;
+  }
+  .grid-child-heading {
+    font-size: 18px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .grid-container {
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr;
   }
 }

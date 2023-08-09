@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "d3": "^7.8.4",
+    "micromodal": "^0.4.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-spring": "^9.7.1"
