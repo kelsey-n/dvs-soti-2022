@@ -188,6 +188,8 @@
   grid-template-rows: 1fr 1fr; /* Two rows of equal size */
   grid-template-columns: 1fr 1fr; /* Two columns of equal size */
   gap: 20px; /* Adjust the gap between rows and columns as needed */
+  max-width: 800px;
+  margin: auto;
 }
 
 .grid-child {
@@ -238,5 +240,6 @@
   .grid-container {
     grid-template-rows: 1fr;
     grid-template-columns: 1fr;
+    max-width: 320px;
   }
 }
