@@ -146,7 +146,7 @@ function App() {
       })} */}
       <animated.div className="intro-wrapper" style={introTextStyles}>
         <div className="title">
-          The rise and fall of data viz tools
+          Evolution of data viz tools
           {/* <span style={{ fontSize: '16px' }}>(2017 - 2022)</span> */}
         </div>
         <div className="intro-text">
