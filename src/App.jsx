@@ -152,14 +152,22 @@ function App() {
         <div className="intro-text">
           <div className="left-align">
             This visualization (about the tools used <em>for</em> data
-            visualization) shows the evolution of one part of this blossoming
-            industry. Growth in the field as a whole can be seen by the increase
-            in respondents to the DVS industry survey, as well as the by the
-            diversity of tools used. In 2017, most tools used were coding-heavy
-            tools, like D3, ggplot, Python or R. But by 2022, we see a diverse
-            field of tools including: tools not traditionally used for data viz
-            (e.g. Powerpoint); design tools (like Figma and Illustrator); and
-            online data viz platforms (e.g. RAWGraphs and Flourish).
+            visualization) shows the evolution of this flourishing industry.
+            Growth in the field is evident by the increase in respondents to the
+            Data Visualization Society's{' '}
+            <a
+              href="https://www.datavisualizationsociety.org/survey"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              industry survey
+            </a>
+            , as well as the diversity of tools used by data viz practitioners.
+            In 2017, most tools used were coding-heavy ones, like D3, ggplot,
+            Python and R. But by 2022, we see a more diverse field of tools
+            including: tools not traditionally used for data viz (e.g.
+            Powerpoint); design tools (e.g. Figma and Illustrator); and online
+            data viz platforms (e.g. RAWGraphs and Flourish).
           </div>
           <br></br>
           <em>Let's meet some of the notable players in this field:</em>
